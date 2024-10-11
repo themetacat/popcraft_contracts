@@ -1,1 +1,1 @@
-# pixelaw_examples_mud
+# PopCraft Contracts based on MUD
