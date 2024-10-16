@@ -43,6 +43,41 @@ export default mudConfig({
         successTimes: "uint256",
         unissuedRewards: "uint256"
       }
+    },
+    StarToScore: {
+      keySchema: {
+        amount: "uint256" 
+      },
+      valueSchema: {
+        score: "uint256",
+      }
+    },
+    DayToScore: {
+      keySchema: {
+        day: "uint256" 
+      },
+      valueSchema: {
+        score: "uint256",
+      }
+    },
+    RankingRecord: {
+      keySchema:{
+        owner: "address",
+      },
+      valueSchema: {
+        totalScore: "uint256",
+        highestScore: "uint256",
+        latestScores: "uint256",
+        shortestTime: "uint256"
+      }
+    },
+    Token: {
+      keySchema: {
+        index: "uint256" 
+      },
+      valueSchema: {
+        tokenAddress: "address[]",
+      }
     }
   },
   systems: {

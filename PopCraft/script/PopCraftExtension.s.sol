@@ -15,7 +15,7 @@ import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
 import { IStore } from "@latticexyz/store/src/IStore.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 import { DefaultParameters } from "../src/core_codegen/index.sol";
-import { TCMPopStar, GameRecord, TokenSold, TokenBalance } from "../src/codegen/index.sol";
+import { TCMPopStar, GameRecord, TokenSold, TokenBalance, StarToScore, DayToScore, RankingRecord, Token } from "../src/codegen/index.sol";
 // import { TokenSold } from "../src/codegen/index.sol";
 // import { TokenBalance } from "../src/codegen/index.sol";
 import { PopCraftSystem } from "../src/systems/PopCraftSystem.sol";
@@ -34,25 +34,69 @@ contract PopCraftExtension is Script {
     console.log("System ID:    %x", uint256(ResourceId.unwrap(systemResource)));
 
     vm.startBroadcast(deployerPrivateKey);
-    world.registerNamespace(namespaceResource);
+    // world.registerNamespace(namespaceResource);
 
     StoreSwitch.setStoreAddress(worldAddress);
 
-    TCMPopStar.register();
-    TokenSold.register();
-    TokenBalance.register();
-    GameRecord.register();
+    // TCMPopStar.register();
+    // TokenSold.register();
+    // TokenBalance.register();
+    // GameRecord.register();
+    // StarToScore.register();
+    // DayToScore.register();
+    // RankingRecord.register();
+    // Token.register();
+
+    // over 5 star 
+    // StarToScore.set(0, 5);
+
+    // StarToScore.set(1, 1);
+    // StarToScore.set(2, 2);
+    // StarToScore.set(3, 6);
+    // StarToScore.set(4, 12);
+    // StarToScore.set(5, 20);
+    // game success
+    // StarToScore.set(101, 50);
+
+    // Additional rewards for logging in for 7 consecutive days
+    // DayToScore.set(0, 500);
+    // DayToScore.set(1, 20);
+    // DayToScore.set(2, 40);
+    // DayToScore.set(3, 60);
+    // DayToScore.set(4, 80);
+    // DayToScore.set(5, 100);
+    // DayToScore.set(6, 150);
+    // DayToScore.set(7, 200);
+
+    // address[10] memory tokenAddress = [
+    //   0xC750a84ECE60aFE3CBf4154958d18036D3f15786,
+    //   0x65638Aa354d2dEC431aa851F52eC0528cc6D84f3,
+    //   0xD64f7863d030Ae7090Fe0D8109E48B6f17f53145,
+    //   0x160F5016Bb027695968df938aa04A95B575939f7,
+    //   0x1ca53886132119F99eE4994cA9D0a9BcCD2bB96f,
+    //   0x7Ea470137215BDD77370fC3b049bd1d009e409f9,
+    //   0xca7f09561D1d80C5b31b390c8182A0554CF09F21,
+    //   0xdCc7Bd0964B467554C9b64d3eD610Dff12AF794e,
+    //   0x54b31D72a658A5145704E8fC2cAf5f87855cc1Cd,
+    //   0xF66D7aB71764feae0e15E75BAB89Bd0081a7180d
+    // ];
+    // address[] memory dynamicTokenAddress = new address[](10);
+
+    // for (uint256 i = 0; i < 10; i++) {
+    //   dynamicTokenAddress[i] = tokenAddress[i];
+    // }
+    // Token.set(0, dynamicTokenAddress);
 
     PopCraftSystem popCraftSystem = new PopCraftSystem();
     console.log("SYSTEM_ADDRESS: ", address(popCraftSystem));
     
     world.registerSystem(systemResource, popCraftSystem, true);
-    world.registerFunctionSelector(systemResource, "init()");
-    world.registerFunctionSelector(systemResource, "interact((address,string,(uint32,uint32),string))");
-    world.registerFunctionSelector(systemResource, "pop((address,string,(uint32,uint32),string))");
-    world.registerFunctionSelector(systemResource, "buyToken((bytes,uint256,(address,uint256))[])");
-    // world.registerFunctionSelector(systemResource, "withDrawToken(address,uint256)");
-    world.registerFunctionSelector(systemResource, "reIssuanceRewards(address[])");
+    // world.registerFunctionSelector(systemResource, "init()");
+    // world.registerFunctionSelector(systemResource, "interact((address,string,(uint32,uint32),string))");
+    // world.registerFunctionSelector(systemResource, "pop((address,string,(uint32,uint32),string))");
+    // world.registerFunctionSelector(systemResource, "buyToken((bytes,uint256,(address,uint256))[])");
+    // // world.registerFunctionSelector(systemResource, "withDrawToken(address,uint256)");
+    // world.registerFunctionSelector(systemResource, "reIssuanceRewards(address[])");
     vm.stopBroadcast();
   }
 

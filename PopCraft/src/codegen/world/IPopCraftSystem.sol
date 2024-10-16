@@ -11,10 +11,6 @@ import { DefaultParameters, UniversalRouterParams } from "./../../core_codegen/i
  */
 interface IPopCraftSystem {
   error InsufficientBalance(address);
-  error Inventory_shortage(address shortageToken);
-  error GetQuoteError();
-  error GameContinues();
-  error ExceededPurchaseLimit(uint256 limit);
 
   function popCraft_PopCraftSystem_init() external;
 
