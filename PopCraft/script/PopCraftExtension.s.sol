@@ -42,50 +42,50 @@ contract PopCraftExtension is Script {
     // TokenSold.register();
     // TokenBalance.register();
     // GameRecord.register();
-    // StarToScore.register();
-    // DayToScore.register();
-    // RankingRecord.register();
-    // Token.register();
+    StarToScore.register();
+    DayToScore.register();
+    RankingRecord.register();
+    Token.register();
 
     // over 5 star 
-    // StarToScore.set(0, 5);
+    StarToScore.set(0, 10);
 
-    // StarToScore.set(1, 1);
-    // StarToScore.set(2, 2);
-    // StarToScore.set(3, 6);
-    // StarToScore.set(4, 12);
-    // StarToScore.set(5, 20);
+    StarToScore.set(1, 15);
+    StarToScore.set(2, 3);
+    StarToScore.set(3, 9);
+    StarToScore.set(4, 16);
+    StarToScore.set(5, 25);
     // game success
-    // StarToScore.set(101, 50);
+    StarToScore.set(101, 50);
 
     // Additional rewards for logging in for 7 consecutive days
-    // DayToScore.set(0, 500);
-    // DayToScore.set(1, 20);
-    // DayToScore.set(2, 40);
-    // DayToScore.set(3, 60);
-    // DayToScore.set(4, 80);
-    // DayToScore.set(5, 100);
-    // DayToScore.set(6, 150);
-    // DayToScore.set(7, 200);
+    DayToScore.set(0, 500);
+    DayToScore.set(1, 20);
+    DayToScore.set(2, 40);
+    DayToScore.set(3, 60);
+    DayToScore.set(4, 80);
+    DayToScore.set(5, 100);
+    DayToScore.set(6, 150);
+    DayToScore.set(7, 200);
 
-    // address[10] memory tokenAddress = [
-    //   0xC750a84ECE60aFE3CBf4154958d18036D3f15786,
-    //   0x65638Aa354d2dEC431aa851F52eC0528cc6D84f3,
-    //   0xD64f7863d030Ae7090Fe0D8109E48B6f17f53145,
-    //   0x160F5016Bb027695968df938aa04A95B575939f7,
-    //   0x1ca53886132119F99eE4994cA9D0a9BcCD2bB96f,
-    //   0x7Ea470137215BDD77370fC3b049bd1d009e409f9,
-    //   0xca7f09561D1d80C5b31b390c8182A0554CF09F21,
-    //   0xdCc7Bd0964B467554C9b64d3eD610Dff12AF794e,
-    //   0x54b31D72a658A5145704E8fC2cAf5f87855cc1Cd,
-    //   0xF66D7aB71764feae0e15E75BAB89Bd0081a7180d
-    // ];
-    // address[] memory dynamicTokenAddress = new address[](10);
+    address[10] memory tokenAddress = [
+      0xC750a84ECE60aFE3CBf4154958d18036D3f15786,
+      0x65638Aa354d2dEC431aa851F52eC0528cc6D84f3,
+      0xD64f7863d030Ae7090Fe0D8109E48B6f17f53145,
+      0x160F5016Bb027695968df938aa04A95B575939f7,
+      0x1ca53886132119F99eE4994cA9D0a9BcCD2bB96f,
+      0x7Ea470137215BDD77370fC3b049bd1d009e409f9,
+      0xca7f09561D1d80C5b31b390c8182A0554CF09F21,
+      0xdCc7Bd0964B467554C9b64d3eD610Dff12AF794e,
+      0x54b31D72a658A5145704E8fC2cAf5f87855cc1Cd,
+      0xF66D7aB71764feae0e15E75BAB89Bd0081a7180d
+    ];
+    address[] memory dynamicTokenAddress = new address[](10);
 
-    // for (uint256 i = 0; i < 10; i++) {
-    //   dynamicTokenAddress[i] = tokenAddress[i];
-    // }
-    // Token.set(0, dynamicTokenAddress);
+    for (uint256 i = 0; i < 10; i++) {
+      dynamicTokenAddress[i] = tokenAddress[i];
+    }
+    Token.set(0, dynamicTokenAddress);
 
     PopCraftSystem popCraftSystem = new PopCraftSystem();
     console.log("SYSTEM_ADDRESS: ", address(popCraftSystem));
