@@ -78,6 +78,14 @@ export default mudConfig({
       valueSchema: {
         tokenAddress: "address[]",
       }
+    },
+    OverTime: {
+      keySchema: {
+        level: "uint256" 
+      },
+      valueSchema: {
+        time: "uint256",
+      }
     }
   },
   systems: {

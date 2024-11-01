@@ -8,7 +8,7 @@ import { PermissionsData, DefaultParameters, Position, PixelUpdateData, Pixel, P
 import "@openzeppelin/contracts/utils/Strings.sol";
 import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, 
         TokenSoldData, GameRecord, GameRecordData, StarToScore, 
-        DayToScore, RankingRecord, Token } from "../codegen/index.sol";
+        DayToScore, RankingRecord, Token, OverTime} from "../codegen/index.sol";
 import { IERC20 } from "@latticexyz/world-modules/src/modules/erc20-puppet/IERC20.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
@@ -29,7 +29,6 @@ contract PopCraftSystem is System {
   bytes14 constant BYTESNAMESPACE = bytes14(bytes(NAMESPACE));
 
   bytes32 bytes_name = converToBytes32("PopCraft");
-  uint256 overtime = 4 minutes + 3 seconds;
   uint256 constant bonus = 150 * 10 ** 18;
   address constant BUGS = 0x9c0153C56b460656DF4533246302d42Bd2b49947;
 
@@ -152,6 +151,8 @@ contract PopCraftSystem is System {
     require(keccak256(abi.encodePacked(pixel.app)) == keccak256(abi.encodePacked("PopCraft")) && tcmPopStarData.matrixArray.length == 100, "Not PopCraft app");
 
     require(!tcmPopStarData.gameFinished, "Game Over");
+    uint256 overtime = OverTime.get(0) * 1 seconds;
+
     if(block.timestamp > (tcmPopStarData.startTime + overtime)){
       TCMPopStar.set(sender, tcmPopStarData.x, tcmPopStarData.y, tcmPopStarData.startTime, true, tcmPopStarData.matrixArray, tcmPopStarData.tokenAddressArr);
       return;
