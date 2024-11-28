@@ -37,7 +37,7 @@ contract PopCraftSystem is System {
   error InsufficientBalance(address);
 
   constructor() {
-    coreSystem = ICoreSystem(0xdfa57287C291e763a9452738b67ac56179AB5F69);
+    coreSystem = ICoreSystem(0xC44504Ab6a2C4dF9a9ce82aecFc453FeC3C8771C);
   }
   receive() external payable {}
 
