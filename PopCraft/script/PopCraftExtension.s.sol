@@ -48,7 +48,7 @@ contract PopCraftExtension is Script {
     Token.register();
     OverTime.register();
 
-    OverTime.set(0, 92);
+    OverTime.set(0, 122);
 
     // over 5 star 
     StarToScore.set(0, 10);
