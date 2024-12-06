@@ -86,6 +86,24 @@ export default mudConfig({
       valueSchema: {
         time: "uint256",
       }
+    },
+    GameRecordEvent: {
+      keySchema: {
+        id: "bytes32"
+      },
+      valueSchema: {
+        owner: "address",
+        gameStatus: "uint256"
+      },
+      offchainOnly: true
+    },
+    GameFailedRecord: {
+      keySchema: {
+        owner: "address"
+      },
+      valueSchema: {
+        times: "uint256"
+      }
     }
   },
   systems: {

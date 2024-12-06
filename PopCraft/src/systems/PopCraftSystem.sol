@@ -8,7 +8,8 @@ import { PermissionsData, DefaultParameters, Position, PixelUpdateData, Pixel, P
 import "@openzeppelin/contracts/utils/Strings.sol";
 import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, 
         TokenSoldData, GameRecord, GameRecordData, StarToScore, 
-        DayToScore, RankingRecord, Token, OverTime} from "../codegen/index.sol";
+        DayToScore, RankingRecord, Token, OverTime, GameRecordEvent,
+         GameFailedRecord} from "../codegen/index.sol";
 import { IERC20 } from "@latticexyz/world-modules/src/modules/erc20-puppet/IERC20.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
@@ -155,6 +156,11 @@ contract PopCraftSystem is System {
 
     if(block.timestamp > (tcmPopStarData.startTime + overtime)){
       TCMPopStar.set(sender, tcmPopStarData.x, tcmPopStarData.y, tcmPopStarData.startTime, true, tcmPopStarData.matrixArray, tcmPopStarData.tokenAddressArr);
+      
+      bytes32 gameRecordEventId = keccak256(abi.encodePacked(block.timestamp, block.number, sender));
+      GameRecordEvent.set(gameRecordEventId, sender, 2);
+
+      GameFailedRecord.set(sender, GameFailedRecord.get(sender)+1);
       return;
     }
     
@@ -222,6 +228,8 @@ contract PopCraftSystem is System {
       // game success
       if(game_finished){
         _gameFinished();
+        bytes32 gameRecordEventId = keccak256(abi.encodePacked(block.timestamp, block.number, sender, click_value));
+        GameRecordEvent.set(gameRecordEventId, sender, 1);
         updateRankRecord(eliminate_amount, true);
       }else{
         updateRankRecord(eliminate_amount, false);
