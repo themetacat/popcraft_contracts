@@ -157,10 +157,12 @@ contract PopCraftSystem is System {
     if(block.timestamp > (tcmPopStarData.startTime + overtime)){
       TCMPopStar.set(sender, tcmPopStarData.x, tcmPopStarData.y, tcmPopStarData.startTime, true, tcmPopStarData.matrixArray, tcmPopStarData.tokenAddressArr);
       
-      bytes32 gameRecordEventId = keccak256(abi.encodePacked(block.timestamp, block.number, sender));
-      GameRecordEvent.set(gameRecordEventId, sender, 2);
-
-      GameFailedRecord.set(sender, GameFailedRecord.get(sender)+1);
+      uint256 lastestScores = RankingRecord.getLatestScores(sender);
+      if(lastestScores >= 100){
+        bytes32 gameRecordEventId = keccak256(abi.encodePacked(block.timestamp, block.number, sender));
+        GameRecordEvent.set(gameRecordEventId, sender, 2);
+        GameFailedRecord.set(sender, GameFailedRecord.get(sender)+1);
+      }
       return;
     }
     
