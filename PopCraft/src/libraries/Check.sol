@@ -21,8 +21,8 @@ library Check {
     if(changeTimes > 3){
       changeTimes = 3;
     }
-    // !!!!!! change score
-    uint256 growScore = 20 + changeTimes * 10;
+    
+    uint256 growScore = 2000 + changeTimes * 1000;
     uint256 playerTotalScore = RankingRecord.getTotalScore(owner);
     uint256 totalScoreConsumed = PlayerPlantingRecord.getScores(0, owner);
     uint256 availableScore = 0;

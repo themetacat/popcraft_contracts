@@ -41,12 +41,11 @@ contract PlantsSystem is System {
         require(currentPlantsId != 0, "No Plants");
 
         Check.requireLevelSet(currentPlantsId, nextLevel);
+        Check.checkScoreSufficiency(currentPlantsId, nextLevel, owner);
 
         PlantsLevelData memory plantsLevelData = PlantsLevel.get(currentPlantsId, nextLevel);
         uint256 growScore = plantsLevelData.score;
         require(block.timestamp >= currentPlayerPlantsData.growTime + plantsLevelData.intervalTime, "The growth time is too short");
-        
-        Check.checkScoreSufficiency(currentPlantsId, nextLevel, owner);
         
         // total plants record
         PlayerPlantingRecordData memory totalPlantingRecordData = PlayerPlantingRecord.get(0, owner);

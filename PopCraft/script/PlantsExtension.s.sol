@@ -40,60 +40,58 @@ contract PlantsExtension is Script {
     Plants.set(4, 5, "Edelweiss");
     Plants.set(5, 5, "Plum blossom");
     Plants.set(6, 5, "Marigold");
+    Plants.set(7, 5, "Chrysanthemum");
+    Plants.set(8, 5, "Hydrangea");
 
-    // Plants.set(7, 5, "Chrysanthemum");
-    // Plants.set(8, 5, "Hydrangea");
+    TotalPlants.set(0, 8);
 
-    TotalPlants.set(0, 6);
-    // TotalPlants.set(0, 8);
+    PlantsLevel.set(1, 1, 1000, 0, ""); // seed
+    PlantsLevel.set(1, 2, 2000, 180, ""); // germinate 60s
+    PlantsLevel.set(1, 3, 6000, 10800, ""); // stem leaf 3600s
+    PlantsLevel.set(1, 4, 9000, 43200, ""); // flower bud 12h
+    PlantsLevel.set(1, 5, 12000, 86400, ""); // bloom 24
 
-    PlantsLevel.set(1, 1, 10, 0, ""); // seed
-    PlantsLevel.set(1, 2, 20, 10, ""); // germinate 60s
-    PlantsLevel.set(1, 3, 60, 20, ""); // stem leaf 3600s
-    PlantsLevel.set(1, 4, 90, 40, ""); // flower bud 12h
-    PlantsLevel.set(1, 5, 120, 60, ""); // bloom 24
+    PlantsLevel.set(2, 1, 1000, 0, "");
+    PlantsLevel.set(2, 2, 2000, 180, "");
+    PlantsLevel.set(2, 3, 6000, 10800, "");
+    PlantsLevel.set(2, 4, 9000, 43200, "");
+    PlantsLevel.set(2, 5, 12000, 86400, "");
 
-    PlantsLevel.set(2, 1, 10, 0, "");
-    PlantsLevel.set(2, 2, 20, 10, "");
-    PlantsLevel.set(2, 3, 60, 20, "");
-    PlantsLevel.set(2, 4, 90, 40, "");
-    PlantsLevel.set(2, 5, 120, 60, "");
+    PlantsLevel.set(3, 1, 1000, 0, "");
+    PlantsLevel.set(3, 2, 2000, 180, "");
+    PlantsLevel.set(3, 3, 6000, 10800, "");
+    PlantsLevel.set(3, 4, 9000, 43200, "");
+    PlantsLevel.set(3, 5, 12000, 86400, "");
 
-    PlantsLevel.set(3, 1, 10, 0, "");
-    PlantsLevel.set(3, 2, 20, 10, "");
-    PlantsLevel.set(3, 3, 60, 20, "");
-    PlantsLevel.set(3, 4, 90, 40, "");
-    PlantsLevel.set(3, 5, 120, 60, "");
+    PlantsLevel.set(4, 1, 1000, 0, "");
+    PlantsLevel.set(4, 2, 2000, 180, "");
+    PlantsLevel.set(4, 3, 6000, 10800, "");
+    PlantsLevel.set(4, 4, 9000, 43200, "");
+    PlantsLevel.set(4, 5, 12000, 86400, "");
 
-    PlantsLevel.set(4, 1, 10, 0, "");
-    PlantsLevel.set(4, 2, 20, 10, "");
-    PlantsLevel.set(4, 3, 60, 20, "");
-    PlantsLevel.set(4, 4, 90, 40, "");
-    PlantsLevel.set(4, 5, 120, 60, "");
+    PlantsLevel.set(5, 1, 1000, 0, "");
+    PlantsLevel.set(5, 2, 2000, 180, "");
+    PlantsLevel.set(5, 3, 6000, 10800, "");
+    PlantsLevel.set(5, 4, 9000, 43200, "");
+    PlantsLevel.set(5, 5, 12000, 86400, "");
 
-    PlantsLevel.set(5, 1, 10, 0, "");
-    PlantsLevel.set(5, 2, 20, 10, "");
-    PlantsLevel.set(5, 3, 60, 20, "");
-    PlantsLevel.set(5, 4, 90, 40, "");
-    PlantsLevel.set(5, 5, 120, 60, "");
+    PlantsLevel.set(6, 1, 1000, 0, "");
+    PlantsLevel.set(6, 2, 2000, 180, "");
+    PlantsLevel.set(6, 3, 6000, 10800, "");
+    PlantsLevel.set(6, 4, 9000, 43200, "");
+    PlantsLevel.set(6, 5, 12000, 86400, "");
 
-    PlantsLevel.set(6, 1, 10, 0, "");
-    PlantsLevel.set(6, 2, 20, 10, "");
-    PlantsLevel.set(6, 3, 60, 20, "");
-    PlantsLevel.set(6, 4, 90, 40, "");
-    PlantsLevel.set(6, 5, 120, 60, "");
+    PlantsLevel.set(7, 1, 1000, 0, "");
+    PlantsLevel.set(7, 2, 2000, 180, "");
+    PlantsLevel.set(7, 3, 6000, 10800, "");
+    PlantsLevel.set(7, 4, 9000, 43200, "");
+    PlantsLevel.set(7, 5, 12000, 86400, "");
 
-    // PlantsLevel.set(7, 1, 1000, 0, "");
-    // PlantsLevel.set(7, 2, 2000, 180, "");
-    // PlantsLevel.set(7, 3, 6000, 10800, "");
-    // PlantsLevel.set(7, 4, 9000, 43200, "");
-    // PlantsLevel.set(7, 5, 12000, 86400, "");
-
-    // PlantsLevel.set(8, 1, 1000, 0, "");
-    // PlantsLevel.set(8, 2, 2000, 180, "");
-    // PlantsLevel.set(8, 3, 6000, 10800, "");
-    // PlantsLevel.set(8, 4, 9000, 43200, "");
-    // PlantsLevel.set(8, 5, 12000, 86400, "");
+    PlantsLevel.set(8, 1, 1000, 0, "");
+    PlantsLevel.set(8, 2, 2000, 180, "");
+    PlantsLevel.set(8, 3, 6000, 10800, "");
+    PlantsLevel.set(8, 4, 9000, 43200, "");
+    PlantsLevel.set(8, 5, 12000, 86400, "");
 
     PlantsSystem plantsSystem = new PlantsSystem();
     console.log("SYSTEM_ADDRESS: ", address(plantsSystem));
