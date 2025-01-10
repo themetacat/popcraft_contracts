@@ -14,3 +14,8 @@ import { Token, TokenTableId } from "./tables/Token.sol";
 import { OverTime, OverTimeTableId } from "./tables/OverTime.sol";
 import { GameRecordEvent, GameRecordEventData, GameRecordEventTableId } from "./tables/GameRecordEvent.sol";
 import { GameFailedRecord, GameFailedRecordTableId } from "./tables/GameFailedRecord.sol";
+import { Plants, PlantsData, PlantsTableId } from "./tables/Plants.sol";
+import { TotalPlants, TotalPlantsTableId } from "./tables/TotalPlants.sol";
+import { PlantsLevel, PlantsLevelData, PlantsLevelTableId } from "./tables/PlantsLevel.sol";
+import { PlayerPlantingRecord, PlayerPlantingRecordData, PlayerPlantingRecordTableId } from "./tables/PlayerPlantingRecord.sol";
+import { CurrentPlayerPlants, CurrentPlayerPlantsData, CurrentPlayerPlantsTableId } from "./tables/CurrentPlayerPlants.sol";
