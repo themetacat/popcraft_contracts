@@ -11,6 +11,7 @@ import { StarToScore, StarToScoreTableId } from "./tables/StarToScore.sol";
 import { DayToScore, DayToScoreTableId } from "./tables/DayToScore.sol";
 import { RankingRecord, RankingRecordData, RankingRecordTableId } from "./tables/RankingRecord.sol";
 import { Token, TokenTableId } from "./tables/Token.sol";
+import { PriTokenPrice, PriTokenPriceTableId } from "./tables/PriTokenPrice.sol";
 import { OverTime, OverTimeTableId } from "./tables/OverTime.sol";
 import { GameRecordEvent, GameRecordEventData, GameRecordEventTableId } from "./tables/GameRecordEvent.sol";
 import { GameFailedRecord, GameFailedRecordTableId } from "./tables/GameFailedRecord.sol";

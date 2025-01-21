@@ -79,6 +79,14 @@ export default mudConfig({
         tokenAddress: "address[]",
       }
     },
+    PriTokenPrice: {
+      keySchema: {
+        addr: "address",
+      },
+      valueSchema: {
+        price: "uint256",
+      }
+    },
     OverTime: {
       keySchema: {
         level: "uint256" 

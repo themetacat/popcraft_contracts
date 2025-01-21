@@ -15,7 +15,7 @@ import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
 import { IStore } from "@latticexyz/store/src/IStore.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 import { DefaultParameters } from "../src/core_codegen/index.sol";
-import { TCMPopStar, GameRecord, TokenSold, TokenBalance, StarToScore, DayToScore, RankingRecord, Token, OverTime, GameFailedRecord, GameRecordEvent } from "../src/codegen/index.sol";
+import { TCMPopStar, GameRecord, TokenSold, TokenBalance, StarToScore, DayToScore, RankingRecord, Token, OverTime, GameFailedRecord, GameRecordEvent, PriTokenPrice } from "../src/codegen/index.sol";
 // import { TokenSold } from "../src/codegen/index.sol";
 // import { TokenBalance } from "../src/codegen/index.sol";
 import { PopCraftSystem } from "../src/systems/PopCraftSystem.sol";
@@ -49,6 +49,7 @@ contract PopCraftExtension is Script {
     OverTime.register();
     GameFailedRecord.register();
     GameRecordEvent.register();
+    PriTokenPrice.register();
 
     OverTime.set(0, 122);
 
@@ -92,19 +93,34 @@ contract PopCraftExtension is Script {
     // }
     // Token.set(0, dynamicTokenAddress);
 
-    address[5] memory tokenAddress = [
+    address[7] memory tokenAddress = [
       0x5AF97fE305f3c52Da94C61aeb52Ec0d9A82D73d8,
       0x9f7bd1Ce3412960524e86183B8F005271C09a5E0,
       0x893D9769848288e59fb8a0e97A22d6588A825fFf,
       0x6932cD12f445CFD8E2AC9e0A8324256ce475992F,
-      0x68e7218FCCe3F2658f03317AE08A6446bDE164a8
+      0x68e7218FCCe3F2658f03317AE08A6446bDE164a8,
+      0x0000000000000000000000000000000000000001,
+      0x0000000000000000000000000000000000000002
     ];
-    address[] memory dynamicTokenAddress = new address[](5);
+    address[] memory dynamicTokenAddress = new address[](7);
 
-    for (uint256 i = 0; i < 5; i++) {
+    for (uint256 i = 0; i < tokenAddress.length; i++) {
       dynamicTokenAddress[i] = tokenAddress[i];
     }
     Token.set(0, dynamicTokenAddress);
+
+    address[2] memory priTokenAddress = [
+      0x0000000000000000000000000000000000000001,
+      0x0000000000000000000000000000000000000002
+    ];
+    address[] memory priDynamicTokenAddress = new address[](2);
+    for (uint256 i = 0; i < priTokenAddress.length; i++) {
+      priDynamicTokenAddress[i] = priTokenAddress[i];
+    }
+    Token.set(1, priDynamicTokenAddress);
+
+    PriTokenPrice.set(0x0000000000000000000000000000000000000001, 8000000000000);
+    PriTokenPrice.set(0x0000000000000000000000000000000000000002, 8000000000000);
 
     PopCraftSystem popCraftSystem = new PopCraftSystem();
     console.log("SYSTEM_ADDRESS: ", address(popCraftSystem));
