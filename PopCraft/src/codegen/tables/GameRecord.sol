@@ -26,13 +26,14 @@ ResourceId constant _tableId = ResourceId.wrap(
 ResourceId constant GameRecordTableId = _tableId;
 
 FieldLayout constant _fieldLayout = FieldLayout.wrap(
-  0x0060030020202000000000000000000000000000000000000000000000000000
+  0x0080040020202020000000000000000000000000000000000000000000000000
 );
 
 struct GameRecordData {
   uint256 times;
   uint256 successTimes;
   uint256 unissuedRewards;
+  uint256 totalPoints;
 }
 
 library GameRecord {
@@ -60,10 +61,11 @@ library GameRecord {
    * @return _valueSchema The value schema for the table.
    */
   function getValueSchema() internal pure returns (Schema) {
-    SchemaType[] memory _valueSchema = new SchemaType[](3);
+    SchemaType[] memory _valueSchema = new SchemaType[](4);
     _valueSchema[0] = SchemaType.UINT256;
     _valueSchema[1] = SchemaType.UINT256;
     _valueSchema[2] = SchemaType.UINT256;
+    _valueSchema[3] = SchemaType.UINT256;
 
     return SchemaLib.encode(_valueSchema);
   }
@@ -82,10 +84,11 @@ library GameRecord {
    * @return fieldNames An array of strings with the names of value fields.
    */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
-    fieldNames = new string[](3);
+    fieldNames = new string[](4);
     fieldNames[0] = "times";
     fieldNames[1] = "successTimes";
     fieldNames[2] = "unissuedRewards";
+    fieldNames[3] = "totalPoints";
   }
 
   /**
@@ -229,6 +232,48 @@ library GameRecord {
   }
 
   /**
+   * @notice Get totalPoints.
+   */
+  function getTotalPoints(address owner) internal view returns (uint256 totalPoints) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+
+    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 3, _fieldLayout);
+    return (uint256(bytes32(_blob)));
+  }
+
+  /**
+   * @notice Get totalPoints.
+   */
+  function _getTotalPoints(address owner) internal view returns (uint256 totalPoints) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+
+    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 3, _fieldLayout);
+    return (uint256(bytes32(_blob)));
+  }
+
+  /**
+   * @notice Set totalPoints.
+   */
+  function setTotalPoints(address owner, uint256 totalPoints) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 3, abi.encodePacked((totalPoints)), _fieldLayout);
+  }
+
+  /**
+   * @notice Set totalPoints.
+   */
+  function _setTotalPoints(address owner, uint256 totalPoints) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+
+    StoreCore.setStaticField(_tableId, _keyTuple, 3, abi.encodePacked((totalPoints)), _fieldLayout);
+  }
+
+  /**
    * @notice Get the full data.
    */
   function get(address owner) internal view returns (GameRecordData memory _table) {
@@ -261,8 +306,14 @@ library GameRecord {
   /**
    * @notice Set the full data using individual values.
    */
-  function set(address owner, uint256 times, uint256 successTimes, uint256 unissuedRewards) internal {
-    bytes memory _staticData = encodeStatic(times, successTimes, unissuedRewards);
+  function set(
+    address owner,
+    uint256 times,
+    uint256 successTimes,
+    uint256 unissuedRewards,
+    uint256 totalPoints
+  ) internal {
+    bytes memory _staticData = encodeStatic(times, successTimes, unissuedRewards, totalPoints);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -276,8 +327,14 @@ library GameRecord {
   /**
    * @notice Set the full data using individual values.
    */
-  function _set(address owner, uint256 times, uint256 successTimes, uint256 unissuedRewards) internal {
-    bytes memory _staticData = encodeStatic(times, successTimes, unissuedRewards);
+  function _set(
+    address owner,
+    uint256 times,
+    uint256 successTimes,
+    uint256 unissuedRewards,
+    uint256 totalPoints
+  ) internal {
+    bytes memory _staticData = encodeStatic(times, successTimes, unissuedRewards, totalPoints);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -292,7 +349,12 @@ library GameRecord {
    * @notice Set the full data using the data struct.
    */
   function set(address owner, GameRecordData memory _table) internal {
-    bytes memory _staticData = encodeStatic(_table.times, _table.successTimes, _table.unissuedRewards);
+    bytes memory _staticData = encodeStatic(
+      _table.times,
+      _table.successTimes,
+      _table.unissuedRewards,
+      _table.totalPoints
+    );
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -307,7 +369,12 @@ library GameRecord {
    * @notice Set the full data using the data struct.
    */
   function _set(address owner, GameRecordData memory _table) internal {
-    bytes memory _staticData = encodeStatic(_table.times, _table.successTimes, _table.unissuedRewards);
+    bytes memory _staticData = encodeStatic(
+      _table.times,
+      _table.successTimes,
+      _table.unissuedRewards,
+      _table.totalPoints
+    );
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -323,12 +390,14 @@ library GameRecord {
    */
   function decodeStatic(
     bytes memory _blob
-  ) internal pure returns (uint256 times, uint256 successTimes, uint256 unissuedRewards) {
+  ) internal pure returns (uint256 times, uint256 successTimes, uint256 unissuedRewards, uint256 totalPoints) {
     times = (uint256(Bytes.slice32(_blob, 0)));
 
     successTimes = (uint256(Bytes.slice32(_blob, 32)));
 
     unissuedRewards = (uint256(Bytes.slice32(_blob, 64)));
+
+    totalPoints = (uint256(Bytes.slice32(_blob, 96)));
   }
 
   /**
@@ -342,7 +411,7 @@ library GameRecord {
     PackedCounter,
     bytes memory
   ) internal pure returns (GameRecordData memory _table) {
-    (_table.times, _table.successTimes, _table.unissuedRewards) = decodeStatic(_staticData);
+    (_table.times, _table.successTimes, _table.unissuedRewards, _table.totalPoints) = decodeStatic(_staticData);
   }
 
   /**
@@ -372,9 +441,10 @@ library GameRecord {
   function encodeStatic(
     uint256 times,
     uint256 successTimes,
-    uint256 unissuedRewards
+    uint256 unissuedRewards,
+    uint256 totalPoints
   ) internal pure returns (bytes memory) {
-    return abi.encodePacked(times, successTimes, unissuedRewards);
+    return abi.encodePacked(times, successTimes, unissuedRewards, totalPoints);
   }
 
   /**
@@ -386,9 +456,10 @@ library GameRecord {
   function encode(
     uint256 times,
     uint256 successTimes,
-    uint256 unissuedRewards
+    uint256 unissuedRewards,
+    uint256 totalPoints
   ) internal pure returns (bytes memory, PackedCounter, bytes memory) {
-    bytes memory _staticData = encodeStatic(times, successTimes, unissuedRewards);
+    bytes memory _staticData = encodeStatic(times, successTimes, unissuedRewards, totalPoints);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;

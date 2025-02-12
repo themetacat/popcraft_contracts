@@ -32,7 +32,7 @@ contract PopCraftExtension is Script {
     ];
 
     for (uint256 i = 0; i < 9; i++) {
-      GameRecord.set(userAddress[i], 0, 0, 0);
+      // GameRecord.set(userAddress[i], 0, 0, 0);
       RankingRecord.set(userAddress[i], 0, 0, 0, 0);
       // GameRecord.deleteRecord(userAddress[i]);
       // RankingRecord.deleteRecord(userAddress[i]);

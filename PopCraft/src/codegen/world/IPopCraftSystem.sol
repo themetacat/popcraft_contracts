@@ -19,6 +19,4 @@ interface IPopCraftSystem {
   function popCraft_PopCraftSystem_pop(DefaultParameters memory default_parameters) external;
 
   function popCraft_PopCraftSystem_buyToken(UniversalRouterParams[] calldata universalRouterParams) external payable;
-
-  function popCraft_PopCraftSystem_reIssuanceRewards(address[] memory owner) external;
 }

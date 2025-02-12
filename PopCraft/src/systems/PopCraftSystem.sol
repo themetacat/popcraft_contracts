@@ -6,14 +6,13 @@ import { ICoreSystem } from "../core_codegen/world/ICoreSystem.sol";
 import { IWorld } from "../core_codegen/world/IWorld.sol";
 import { PermissionsData, DefaultParameters, Position, PixelUpdateData, Pixel, PixelData, ERC20TokenBalance, UniversalRouterParams, TokenInfo } from "../core_codegen/index.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, GameRecordEvent, GameFailedRecord } from "../codegen/index.sol";
+import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, UserBenefitsToken } from "../codegen/index.sol";
 import { IERC20 } from "@latticexyz/world-modules/src/modules/erc20-puppet/IERC20.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
 import { Puppet } from "@latticexyz/world-modules/src/modules/puppet/Puppet.sol";
 import { WorldContextConsumerLib } from "@latticexyz/world/src/WorldContext.sol";
 import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
-// import { IERC20 } from "../interfaces/IERC20.sol";
 import { IQuote, SwapParams, Quote } from "../interfaces/IQuote.sol";
 import { AccessControl } from "@latticexyz/world/src/AccessControl.sol";
 import { Check } from "../libraries/Check.sol";
@@ -28,16 +27,9 @@ contract PopCraftSystem is System {
   bytes14 constant BYTESNAMESPACE = bytes14(bytes(NAMESPACE));
 
   bytes32 bytes_name = converToBytes32("PopCraft");
-  uint256 constant bonus = 150 * 10 ** 18;
-  address constant BUGS = 0x9c0153C56b460656DF4533246302d42Bd2b49947;
-
-  ICoreSystem internal coreSystem;
 
   error InsufficientBalance(address);
 
-  constructor() {
-    coreSystem = ICoreSystem(0xC44504Ab6a2C4dF9a9ce82aecFc453FeC3C8771C);
-  }
   receive() external payable {}
 
   function init() public {
@@ -51,38 +43,12 @@ contract PopCraftSystem is System {
 
     if(tcmPopStarData.startTime > 0){
       position = Position({x: tcmPopStarData.x, y: tcmPopStarData.y});
-    }else{
-      require(ownerlessSpace(position), "Pixel not enough");
     }
 
     {
       uint256 timestamp = block.timestamp;
-      // PixelUpdateData[] memory pixelUpdateData = new PixelUpdateData[](100);
       uint256[] memory matrix = shuffle();
       address[] memory tokenAddressArr = randomTCMToken();
-      // string memory text;
-      // string memory color;
-      // uint256 arr_index;
-      // unchecked {
-      //   for(uint32 i; i < 10; i++){
-      //     for(uint32 j; j < 10; j++){
-      //       arr_index = 10*i+j;
-
-      //       (text, color) = getColorText(matrix[arr_index]);
-      //       pixelUpdateData[arr_index] = PixelUpdateData({
-      //           x: position.x + j,
-      //           y: position.y + i,
-      //           color: color,
-      //           timestamp: timestamp,
-      //           text: text,
-      //           app: "PopCraft",
-      //           owner: owner,
-      //           action: "pop"
-      //         });
-      //     }
-      //   }
-      // }
-      // IWorld(_world()).update_pixel_batch(pixelUpdateData);
 
       TCMPopStar.set(owner, position.x, position.y, timestamp, false, matrix, tokenAddressArr);
       uint256 gameTimes = GameRecord.getTimes(owner);
@@ -115,39 +81,17 @@ contract PopCraftSystem is System {
     for (uint256 i = 0; i < 5; i++) {
         uint256 randIndex = uint256(keccak256(abi.encodePacked(block.timestamp, block.number, i))) % n;
         address_arr[i] = tempValues[randIndex];
-        // address_arr[i] = tempValues[i];
         tempValues[randIndex] = tempValues[n - 1];
         n--;
     }
     return address_arr;
   }
 
-  function ownerlessSpace(Position memory position) private view returns (bool) {
-    PixelData memory pixel;
-    for (uint8 i; i < 10; i++) {
-      for (uint8 j; j < 10; j++) {
-        pixel = Pixel.get(position.x + j, position.y + i);
-        if (bytes(pixel.color).length != 0) {
-          return false;
-        } else if (bytes(pixel.text).length != 0) {
-          return false;
-        } else if (bytes(pixel.app).length != 0 || pixel.owner != address(0)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   function pop(DefaultParameters memory default_parameters) public {
     Position memory position = default_parameters.position;
-    // PixelData memory pixel = Pixel.get(position.x, position.y);
     address sender = address(_msgSender());
-    // require(pixel.owner == sender, "Not owner");
 
     TCMPopStarData memory tcmPopStarData = TCMPopStar.get(sender);
-    // require(keccak256(abi.encodePacked(pixel.app)) == keccak256(abi.encodePacked("PopCraft")) && tcmPopStarData.matrixArray.length == 100, "Not PopCraft app");
-
     require(!tcmPopStarData.gameFinished, "Game Over");
     uint256 overtime = OverTime.get(0) * 1 seconds;
 
@@ -162,23 +106,14 @@ contract PopCraftSystem is System {
         tcmPopStarData.tokenAddressArr
       );
 
-      uint256 lastestScores = RankingRecord.getLatestScores(sender);
-      if (lastestScores >= 100) {
-        bytes32 gameRecordEventId = keccak256(abi.encodePacked(block.timestamp, block.number, sender));
-        GameRecordEvent.set(gameRecordEventId, sender, 2);
-        GameFailedRecord.set(sender, GameFailedRecord.get(sender) + 1);
-      }
       return;
     }
-
-    // require(!tcmPopStarData.gameFinished || block.timestamp > (tcmPopStarData.startTime + overtime), "Game Over");
 
     uint256[] memory matrix_array = tcmPopStarData.matrixArray;
     // click num index in matrix
     uint256 matrix_index = (position.x - tcmPopStarData.x) + (position.y - tcmPopStarData.y) * 10;
     // click num value
     uint256 click_value = matrix_array[matrix_index];
-    // require(click_value != 0, "Please click on the star");
     if (click_value == 0) revert("Please click on the star");
     uint256 eliminate_amount;
 
@@ -197,39 +132,9 @@ contract PopCraftSystem is System {
 
     matrix_array = move(matrix_array);
 
-    // uint256[] memory matrix_array = new uint256[](100);
-
     {
       bool game_finished = check_game_finished(matrix_array);
-      // if(game_finished){
-      //   delete_board(tcmPopStarData.x, tcmPopStarData.y);
-      //   uint256[] memory init_arr;
-      //   TCMPopStar.set(pixel.owner, tcmPopStarData.x, tcmPopStarData.y, tcmPopStarData.startTime, game_finished, init_arr, tcmPopStarData.tokenAddressArr);
-
-      // }else{
-      // uint256[] memory origin_matrix = TCMPopStar.getMatrixArray(sender);
-      // string memory text;
-      // string memory color;
-      // for(uint32 i; i < 100; ){
-      //   if(origin_matrix[i] != matrix_array[i]){
-      //     (text, color) = getColorText(matrix_array[i]);
-      //     coreSystem.update_pixel(
-      //       PixelUpdateData({
-      //         x: tcmPopStarData.x + i % 10,
-      //         y: tcmPopStarData.y + i / 10,
-      //         color: color,
-      //         timestamp: pixel.timestamp,
-      //         text: text,
-      //         app: "PopCraft",
-      //         owner: sender,
-      //         action: "pop"
-      //       })
-      //     );
-      //   }
-      //   unchecked{
-      //     i++;
-      //   }
-      // }
+      
       TCMPopStar.set(
         sender,
         tcmPopStarData.x,
@@ -243,8 +148,6 @@ contract PopCraftSystem is System {
       // game success
       if (game_finished) {
         _gameFinished();
-        bytes32 gameRecordEventId = keccak256(abi.encodePacked(block.timestamp, block.number, sender, click_value));
-        GameRecordEvent.set(gameRecordEventId, sender, 1);
         updateRankRecord(eliminate_amount, true);
       } else {
         updateRankRecord(eliminate_amount, false);
@@ -255,36 +158,9 @@ contract PopCraftSystem is System {
   function _gameFinished() private {
     address sender = _msgSender();
     GameRecordData memory gameRecordData = GameRecord.get(sender);
-    uint256 total_supply = ERC20TokenBalance.get(BUGS, WorldResourceIdLib.encodeNamespace(BYTESNAMESPACE));
-    if (total_supply >= bonus) {
-      IWorld(_world()).transferERC20TokenToAddress(
-        WorldResourceIdLib.encodeNamespace(BYTESNAMESPACE),
-        BUGS,
-        sender,
-        bonus
-      );
-    } else {
-      gameRecordData.unissuedRewards += 1;
-    }
-    GameRecord.set(sender, gameRecordData.times, gameRecordData.successTimes += 1, gameRecordData.unissuedRewards);
+    gameRecordData.unissuedRewards += 1;
+    GameRecord.set(sender, gameRecordData.times, gameRecordData.successTimes += 1, gameRecordData.unissuedRewards, gameRecordData.totalPoints+100);
   }
-
-  // function delete_board(uint32 x, uint32 y) private{
-  //   for(uint32 i; i < 100; i++){
-  //     ICoreSystem(_world()).update_pixel(
-  //       PixelUpdateData({
-  //         x: x + i % 10,
-  //         y: y + i / 10,
-  //         color: "",
-  //         timestamp: 0,
-  //         text: "",
-  //         app: "",
-  //         owner: address(0),
-  //         action: ""
-  //       })
-  //     );
-  //   }
-  // }
 
   function _useToken(address token_addr) private {
     address sender = _msgSender();
@@ -500,34 +376,10 @@ contract PopCraftSystem is System {
     return result;
   }
 
-  // function getColorText(uint256 num) private pure returns (string memory text, string memory color){
-  //   text = "";
-  //   if(num == 1){
-  //     text = "1";
-  //     color = "#FFFF00"; //黄色
-  //   }else if(num == 2){
-  //     text = "2";
-  //     color = "#0000FF"; //蓝色
-  //   }else if(num == 3){
-  //     text = "3";
-  //     color = "#de88f6"; //紫色
-  //   }else if(num == 4){
-  //     text = "4";
-  //     color = "#FF0000"; //红色
-  //   }else if(num == 5){
-  //     text = "5";
-  //     color = "#f98690"; //粉色
-  //   }else{
-  //     text = "";
-  //     color = "#000000"; //黑色
-  //   }
-
-  // }
-
   function buyToken(UniversalRouterParams[] calldata universalRouterParams) public payable {
     uint256 router_params_length = universalRouterParams.length;
 
-    // require(_msgValue() > 0, "msgValue < 0");
+    require(_msgValue() > 0, "msgValue < 0");
     (
       UniversalRouterParams[] memory resultParams,
       uint256 value,
@@ -536,20 +388,8 @@ contract PopCraftSystem is System {
     ) = Check.dealUniversalRouterParams(universalRouterParams);
     require(_msgValue() >= value + valuePri, "Insufficient payment amount");
     Check.checkPriTokenPirce(priResultParams, valuePri);
-    if (resultParams.length > 0 && value > 0) {
-      uint256 balance_last = address(this).balance;
-      IWorld(_world()).transferBalanceToAddress(
-        WorldResourceIdLib.encodeNamespace(BYTESNAMESPACE),
-        address(this),
-        value
-      );
-      uint256 balance_after = address(this).balance;
-      require(balance_after - balance_last == value, "Incorrect balance");
-      IWorld(_world()).universalRouterExecuteBatch{ value: value }(
-        resultParams,
-        WorldResourceIdLib.encodeNamespace(BYTESNAMESPACE)
-      );
-    }
+
+    require(resultParams.length == 0, "should be no token");
 
     for (uint256 i; i < router_params_length; i++) {
       address token_addr = universalRouterParams[i].token_info.token_addr;
@@ -578,27 +418,21 @@ contract PopCraftSystem is System {
   // }
   // }
 
-  function reIssuanceRewards(address[] memory owner) external {
-    AccessControl.requireOwner(WorldResourceIdLib.encodeNamespace(BYTESNAMESPACE), _msgSender());
-    uint256 owner_length = owner.length;
-    for (uint256 i; i < owner_length; ) {
-      GameRecordData memory gameRecordData = GameRecord.get(owner[i]);
-      uint256 total_supply = ERC20TokenBalance.get(BUGS, WorldResourceIdLib.encodeNamespace(BYTESNAMESPACE));
-      if (total_supply < bonus) {
-        i = owner_length;
-      } else {
-        uint256 totalBonus = bonus * gameRecordData.unissuedRewards;
-        if (total_supply >= totalBonus) {
-          IWorld(_world()).transferERC20TokenToAddress(
-            WorldResourceIdLib.encodeNamespace(BYTESNAMESPACE),
-            BUGS,
-            owner[i],
-            totalBonus
-          );
-          GameRecord.setUnissuedRewards(owner[i], 0);
-        }
-        i++;
-      }
+  function getUserBenefitsToken() public {
+    address user = _msgSender();
+
+    require(!UserBenefitsToken.get(user), "Already obtained");
+
+    UserBenefitsToken.set(user, true);
+    address[] memory priTokenAddr = Token.get(1);
+    uint256 priTokenAddrLength = priTokenAddr.length;
+    uint256 benefitsAmount = 2 * 10 ** 18;
+    for (uint256 i; i < priTokenAddrLength; i++) {
+      address tokenAddr = priTokenAddr[i];
+      TokenBalance.set(user, tokenAddr, TokenBalance.get(user, tokenAddr) + benefitsAmount);
+
+      TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
+      TokenSold.set(tokenAddr, tokenSoldData.soldNow + benefitsAmount, tokenSoldData.soldAll + benefitsAmount);
     }
   }
 }

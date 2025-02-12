@@ -41,7 +41,8 @@ export default mudConfig({
       valueSchema:{
         times: "uint256",
         successTimes: "uint256",
-        unissuedRewards: "uint256"
+        unissuedRewards: "uint256",
+        totalPoints: "uint256",
       }
     },
     StarToScore: {
@@ -95,22 +96,12 @@ export default mudConfig({
         time: "uint256",
       }
     },
-    GameRecordEvent: {
+    UserBenefitsToken: {
       keySchema: {
-        id: "bytes32"
+        user: "address"
       },
       valueSchema: {
-        owner: "address",
-        gameStatus: "uint256"
-      },
-      offchainOnly: true
-    },
-    GameFailedRecord: {
-      keySchema: {
-        owner: "address"
-      },
-      valueSchema: {
-        times: "uint256"
+        send: "bool"
       }
     },
     //    ------------- Plants ---------------

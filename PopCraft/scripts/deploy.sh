@@ -53,6 +53,8 @@ if [ -z "$EXETENSION_FILE" ]; then
 fi
 
 echo -e "Register app to World contract."
+# add new chain: change here
+# forge script script/${EXETENSION_FILE}.s.sol --rpc-url $RPC_URL --with-gas-price 0.002gwei --priority-gas-price 0.001gwei --broadcast
 forge script script/${EXETENSION_FILE}.s.sol --rpc-url $RPC_URL --broadcast
 sleep 1
 
@@ -76,6 +78,8 @@ if [ $INIT != false ]; then
     else
         echo "SYSTEM_NAME: $SYSTEM_NAME"
     fi
+    # add new chain: change here
+    # cast send $WORLD_ADDRESS --gas-price 0.002gwei --priority-gas-price 0.001gwei --rpc-url $RPC_URL --private-key $PRIVATE_KEY "${NAMESPACE}_${SYSTEM_NAME}_init()" ""
     cast send $WORLD_ADDRESS --rpc-url $RPC_URL --private-key $PRIVATE_KEY "${NAMESPACE}_${SYSTEM_NAME}_init()" ""
 else
     echo -e "==== Update App===="  
@@ -116,6 +120,7 @@ else
     SYSTEM_ADDRESS=$(cat "./broadcast/$EXETENSION_FILE.s.sol/$CHAIN_ID/run-latest.json" | jq -r --arg CONTRACT_NAME "$CONTRACT_NAME" '.transactions[] | select(.contractName == $CONTRACT_NAME) | .contractAddress')
 
     echo $SYSTEM_ADDRESS
+    # cast send $WORLD_ADDRESS --gas-price 0.002gwei --priority-gas-price 0.001gwei --rpc-url $RPC_URL --private-key $PRIVATE_KEY "update_app_system(address, string)" $SYSTEM_ADDRESS $APP_NAME
     cast send $WORLD_ADDRESS --rpc-url $RPC_URL --private-key $PRIVATE_KEY "update_app_system(address, string)" $SYSTEM_ADDRESS $APP_NAME
 fi
 echo -e "Congratulations! Everything is ok! Just visit http://127.0.0.1:3000 to play."

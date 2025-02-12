@@ -21,15 +21,15 @@ import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { RESOURCE_TABLE, RESOURCE_OFFCHAIN_TABLE } from "@latticexyz/store/src/storeResourceTypes.sol";
 
 ResourceId constant _tableId = ResourceId.wrap(
-  bytes32(abi.encodePacked(RESOURCE_TABLE, bytes14("popCraft"), bytes16("GameFailedRecord")))
+  bytes32(abi.encodePacked(RESOURCE_TABLE, bytes14("popCraft"), bytes16("UserBenefitsToke")))
 );
-ResourceId constant GameFailedRecordTableId = _tableId;
+ResourceId constant UserBenefitsTokenTableId = _tableId;
 
 FieldLayout constant _fieldLayout = FieldLayout.wrap(
-  0x0020010020000000000000000000000000000000000000000000000000000000
+  0x0001010001000000000000000000000000000000000000000000000000000000
 );
 
-library GameFailedRecord {
+library UserBenefitsToken {
   /**
    * @notice Get the table values' field layout.
    * @return _fieldLayout The field layout for the table.
@@ -55,7 +55,7 @@ library GameFailedRecord {
    */
   function getValueSchema() internal pure returns (Schema) {
     SchemaType[] memory _valueSchema = new SchemaType[](1);
-    _valueSchema[0] = SchemaType.UINT256;
+    _valueSchema[0] = SchemaType.BOOL;
 
     return SchemaLib.encode(_valueSchema);
   }
@@ -66,7 +66,7 @@ library GameFailedRecord {
    */
   function getKeyNames() internal pure returns (string[] memory keyNames) {
     keyNames = new string[](1);
-    keyNames[0] = "owner";
+    keyNames[0] = "user";
   }
 
   /**
@@ -75,7 +75,7 @@ library GameFailedRecord {
    */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
     fieldNames = new string[](1);
-    fieldNames[0] = "times";
+    fieldNames[0] = "send";
   }
 
   /**
@@ -93,95 +93,95 @@ library GameFailedRecord {
   }
 
   /**
-   * @notice Get times.
+   * @notice Get send.
    */
-  function getTimes(address owner) internal view returns (uint256 times) {
+  function getSend(address user) internal view returns (bool send) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
-    return (uint256(bytes32(_blob)));
+    return (_toBool(uint8(bytes1(_blob))));
   }
 
   /**
-   * @notice Get times.
+   * @notice Get send.
    */
-  function _getTimes(address owner) internal view returns (uint256 times) {
+  function _getSend(address user) internal view returns (bool send) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
-    return (uint256(bytes32(_blob)));
+    return (_toBool(uint8(bytes1(_blob))));
   }
 
   /**
-   * @notice Get times.
+   * @notice Get send.
    */
-  function get(address owner) internal view returns (uint256 times) {
+  function get(address user) internal view returns (bool send) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
-    return (uint256(bytes32(_blob)));
+    return (_toBool(uint8(bytes1(_blob))));
   }
 
   /**
-   * @notice Get times.
+   * @notice Get send.
    */
-  function _get(address owner) internal view returns (uint256 times) {
+  function _get(address user) internal view returns (bool send) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
-    return (uint256(bytes32(_blob)));
+    return (_toBool(uint8(bytes1(_blob))));
   }
 
   /**
-   * @notice Set times.
+   * @notice Set send.
    */
-  function setTimes(address owner, uint256 times) internal {
+  function setSend(address user, bool send) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((times)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((send)), _fieldLayout);
   }
 
   /**
-   * @notice Set times.
+   * @notice Set send.
    */
-  function _setTimes(address owner, uint256 times) internal {
+  function _setSend(address user, bool send) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((times)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((send)), _fieldLayout);
   }
 
   /**
-   * @notice Set times.
+   * @notice Set send.
    */
-  function set(address owner, uint256 times) internal {
+  function set(address user, bool send) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((times)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((send)), _fieldLayout);
   }
 
   /**
-   * @notice Set times.
+   * @notice Set send.
    */
-  function _set(address owner, uint256 times) internal {
+  function _set(address user, bool send) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((times)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((send)), _fieldLayout);
   }
 
   /**
    * @notice Delete all data for given keys.
    */
-  function deleteRecord(address owner) internal {
+  function deleteRecord(address user) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
@@ -189,9 +189,9 @@ library GameFailedRecord {
   /**
    * @notice Delete all data for given keys.
    */
-  function _deleteRecord(address owner) internal {
+  function _deleteRecord(address user) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
     StoreCore.deleteRecord(_tableId, _keyTuple, _fieldLayout);
   }
@@ -200,8 +200,8 @@ library GameFailedRecord {
    * @notice Tightly pack static (fixed length) data using this table's schema.
    * @return The static data, encoded into a sequence of bytes.
    */
-  function encodeStatic(uint256 times) internal pure returns (bytes memory) {
-    return abi.encodePacked(times);
+  function encodeStatic(bool send) internal pure returns (bytes memory) {
+    return abi.encodePacked(send);
   }
 
   /**
@@ -210,8 +210,8 @@ library GameFailedRecord {
    * @return The lengths of the dynamic fields (packed into a single bytes32 value).
    * @return The dyanmic (variable length) data, encoded into a sequence of bytes.
    */
-  function encode(uint256 times) internal pure returns (bytes memory, PackedCounter, bytes memory) {
-    bytes memory _staticData = encodeStatic(times);
+  function encode(bool send) internal pure returns (bytes memory, PackedCounter, bytes memory) {
+    bytes memory _staticData = encodeStatic(send);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -222,10 +222,22 @@ library GameFailedRecord {
   /**
    * @notice Encode keys as a bytes32 array using this table's field layout.
    */
-  function encodeKeyTuple(address owner) internal pure returns (bytes32[] memory) {
+  function encodeKeyTuple(address user) internal pure returns (bytes32[] memory) {
     bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160(owner)));
+    _keyTuple[0] = bytes32(uint256(uint160(user)));
 
     return _keyTuple;
+  }
+}
+
+/**
+ * @notice Cast a value to a bool.
+ * @dev Boolean values are encoded as uint8 (1 = true, 0 = false), but Solidity doesn't allow casting between uint8 and bool.
+ * @param value The uint8 value to convert.
+ * @return result The boolean value.
+ */
+function _toBool(uint8 value) pure returns (bool result) {
+  assembly {
+    result := value
   }
 }
