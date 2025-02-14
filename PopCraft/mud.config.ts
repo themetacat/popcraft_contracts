@@ -104,6 +104,15 @@ export default mudConfig({
         send: "bool"
       }
     },
+    ComboReward: {
+      keySchema: {
+        owner: "address",
+        tokenAddress: "address"
+      },
+      valueSchema: {
+        amount: "uint256"
+      }
+    },
     //    ------------- Plants ---------------
     // add Plants, update TotalPlants
     Plants: {

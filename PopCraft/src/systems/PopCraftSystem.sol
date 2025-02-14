@@ -6,7 +6,7 @@ import { ICoreSystem } from "../core_codegen/world/ICoreSystem.sol";
 import { IWorld } from "../core_codegen/world/IWorld.sol";
 import { PermissionsData, DefaultParameters, Position, PixelUpdateData, Pixel, PixelData, ERC20TokenBalance, UniversalRouterParams, TokenInfo } from "../core_codegen/index.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, UserBenefitsToken } from "../codegen/index.sol";
+import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward } from "../codegen/index.sol";
 import { IERC20 } from "@latticexyz/world-modules/src/modules/erc20-puppet/IERC20.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
@@ -118,9 +118,10 @@ contract PopCraftSystem is System {
     uint256 eliminate_amount;
 
     bool pop_access = check_pop_access(matrix_index, click_value, matrix_array);
+    address token_addr = tcmPopStarData.tokenAddressArr[click_value - 1];
+
     if (!pop_access) {
       {
-        address token_addr = tcmPopStarData.tokenAddressArr[click_value - 1];
         _useToken(token_addr);
 
         matrix_array[matrix_index] = 0;
@@ -128,6 +129,7 @@ contract PopCraftSystem is System {
       }
     } else {
       (matrix_array, eliminate_amount) = dfs(matrix_index, click_value, matrix_array, eliminate_amount);
+      comboReward(eliminate_amount, token_addr);
     }
 
     matrix_array = move(matrix_array);
@@ -259,6 +261,19 @@ contract PopCraftSystem is System {
       RankingRecord.set(owner, totalScore, lastestScores, lastestScores, shortestTime);
     } else {
       RankingRecord.set(owner, totalScore, highestScore, lastestScores, shortestTime);
+    }
+  }
+
+  function comboReward(uint256 eliminateAmount, address tokenAddr) private {
+    if(eliminateAmount >= 5){
+      uint256 amount = eliminateAmount / 5;
+      // add new token: change here
+      uint256 rewardTokenAmount = amount * 10 ** 18;
+      address sender = _msgSender();
+      ComboReward.set(sender, tokenAddr, ComboReward.get(sender, tokenAddr) + rewardTokenAmount);
+      TokenBalance.set(sender, tokenAddr, TokenBalance.get(sender, tokenAddr) + rewardTokenAmount);
+      TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
+      TokenSold.set(tokenAddr, tokenSoldData.soldNow + rewardTokenAmount, tokenSoldData.soldAll + rewardTokenAmount);
     }
   }
 

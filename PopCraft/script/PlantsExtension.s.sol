@@ -34,6 +34,7 @@ contract PlantsExtension is Script {
     PlayerPlantingRecord.register();
     CurrentPlayerPlants.register();
     
+    //add new plants: change here
     Plants.set(1, 5, "Rose");
     Plants.set(2, 5, "Lotus");
     Plants.set(3, 5, "Tulip");
@@ -43,6 +44,7 @@ contract PlantsExtension is Script {
     Plants.set(7, 5, "Chrysanthemum");
     Plants.set(8, 5, "Hydrangea");
 
+    //add new plants: change here
     TotalPlants.set(0, 8);
 
     PlantsLevel.set(1, 1, 1000, 0, ""); // seed

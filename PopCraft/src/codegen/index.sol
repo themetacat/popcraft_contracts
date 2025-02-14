@@ -19,3 +19,4 @@ import { TotalPlants, TotalPlantsTableId } from "./tables/TotalPlants.sol";
 import { PlantsLevel, PlantsLevelData, PlantsLevelTableId } from "./tables/PlantsLevel.sol";
 import { PlayerPlantingRecord, PlayerPlantingRecordData, PlayerPlantingRecordTableId } from "./tables/PlayerPlantingRecord.sol";
 import { CurrentPlayerPlants, CurrentPlayerPlantsData, CurrentPlayerPlantsTableId } from "./tables/CurrentPlayerPlants.sol";
+import { ComboReward, ComboRewardTableId } from "./tables/ComboReward.sol";
