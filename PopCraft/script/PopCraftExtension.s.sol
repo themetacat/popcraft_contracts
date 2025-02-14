@@ -93,7 +93,7 @@ contract PopCraftExtension is Script {
     // }
     // Token.set(0, dynamicTokenAddress);
 
-    address[9] memory tokenAddress = [
+    address[10] memory tokenAddress = [
       0x0000000000000000000000000000000000000003,
       0x0000000000000000000000000000000000000004,
       0x0000000000000000000000000000000000000005,
@@ -102,16 +102,17 @@ contract PopCraftExtension is Script {
       0x0000000000000000000000000000000000000008,
       0x0000000000000000000000000000000000000009,
       0x0000000000000000000000000000000000000010,
-      0x0000000000000000000000000000000000000011
+      0x0000000000000000000000000000000000000011,
+      0x0000000000000000000000000000000000000012
     ];
-    address[] memory dynamicTokenAddress = new address[](9);
+    address[] memory dynamicTokenAddress = new address[](10);
 
     for (uint256 i = 0; i < tokenAddress.length; i++) {
       dynamicTokenAddress[i] = tokenAddress[i];
     }
     Token.set(0, dynamicTokenAddress);
 
-    address[9] memory priTokenAddress = [
+    address[10] memory priTokenAddress = [
       0x0000000000000000000000000000000000000003,
       0x0000000000000000000000000000000000000004,
       0x0000000000000000000000000000000000000005,
@@ -120,9 +121,10 @@ contract PopCraftExtension is Script {
       0x0000000000000000000000000000000000000008,
       0x0000000000000000000000000000000000000009,
       0x0000000000000000000000000000000000000010,
-      0x0000000000000000000000000000000000000011
+      0x0000000000000000000000000000000000000011,
+      0x0000000000000000000000000000000000000012
     ];
-    address[] memory priDynamicTokenAddress = new address[](9);
+    address[] memory priDynamicTokenAddress = new address[](10);
     for (uint256 i = 0; i < priTokenAddress.length; i++) {
       priDynamicTokenAddress[i] = priTokenAddress[i];
     }
@@ -137,6 +139,7 @@ contract PopCraftExtension is Script {
     PriTokenPrice.set(0x0000000000000000000000000000000000000009, 8000000000000);
     PriTokenPrice.set(0x0000000000000000000000000000000000000010, 8000000000000);
     PriTokenPrice.set(0x0000000000000000000000000000000000000011, 8000000000000);
+    PriTokenPrice.set(0x0000000000000000000000000000000000000012, 8000000000000);
 
     PopCraftSystem popCraftSystem = new PopCraftSystem();
     console.log("SYSTEM_ADDRESS: ", address(popCraftSystem));
