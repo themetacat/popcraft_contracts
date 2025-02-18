@@ -84,6 +84,16 @@ contract PopCraftSystem is System {
         tempValues[randIndex] = tempValues[n - 1];
         n--;
     }
+    address KOALA = 0x0000000000000000000000000000000000000012;
+    for (uint256 i = 0; i < 5; i++){
+      if(address_arr[i] == KOALA){
+        break;
+      }else{
+        if(i == 4){
+          address_arr[i] = KOALA;
+        }
+      }
+    }
     return address_arr;
   }
 
