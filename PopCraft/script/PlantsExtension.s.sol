@@ -8,7 +8,7 @@ import { WorldRegistrationSystem } from "@latticexyz/world/src/modules/core/impl
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
 import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
-import { Plants, TotalPlants, PlantsLevel, PlayerPlantingRecord, CurrentPlayerPlants } from "../src/codegen/index.sol";
+import { Plants, TotalPlants, PlantsLevel, PlayerPlantingRecord, CurrentPlayerPlants, SeasonPlantsRecord } from "../src/codegen/index.sol";
 import { PlantsSystem } from "../src/systems/PlantsSystem.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 
@@ -33,6 +33,7 @@ contract PlantsExtension is Script {
     PlantsLevel.register();
     PlayerPlantingRecord.register();
     CurrentPlayerPlants.register();
+    SeasonPlantsRecord.register();
     
     //add new plants: change here
     Plants.set(1, 5, "Rose");

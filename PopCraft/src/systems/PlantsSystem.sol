@@ -2,9 +2,10 @@
 pragma solidity >=0.8.21;
 
 import { System } from "@latticexyz/world/src/System.sol";
-import { RankingRecord, Plants, TotalPlants, PlantsLevel, PlantsLevelData, PlayerPlantingRecord, PlayerPlantingRecordData, CurrentPlayerPlants, CurrentPlayerPlantsData } from "../codegen/index.sol";
+import { RankingRecord, Plants, TotalPlants, PlantsLevel, PlantsLevelData, PlayerPlantingRecord, PlayerPlantingRecordData, CurrentPlayerPlants, CurrentPlayerPlantsData, SeasonPlantsRecord } from "../codegen/index.sol";
 import { Random } from "../libraries/Random.sol";
 import { Check } from "../libraries/Check.sol";
+import { Utils } from "../libraries/Utils.sol";
 
 contract PlantsSystem is System {
     function collectSeed() public {
@@ -59,6 +60,10 @@ contract PlantsSystem is System {
             PlayerPlantingRecord.set(0, owner, newTotalScoreConsumed, totalPlantingRecordData.plantsAmount+1);
             PlayerPlantingRecord.set(currentPlantsId, owner, currentPlantingRecordData.scores + growScore, currentPlantingRecordData.plantsAmount+1);
             CurrentPlayerPlants.set(owner, 0, 0, 0, 0);
+            (uint256 csd, uint256 currentSeason) = Utils.getCurrentSeason();
+            if(csd > 0 && currentSeason > 0){
+                SeasonPlantsRecord.set(owner, currentSeason, csd, currentPlantsId, SeasonPlantsRecord.get(owner, currentSeason, csd, currentPlantsId)+1);
+            }
         }else{
             PlayerPlantingRecord.set(0, owner, newTotalScoreConsumed, totalPlantingRecordData.plantsAmount);
             PlayerPlantingRecord.set(currentPlantsId, owner, currentPlantingRecordData.scores + growScore, currentPlantingRecordData.plantsAmount);

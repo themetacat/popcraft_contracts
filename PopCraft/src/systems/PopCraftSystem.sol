@@ -6,7 +6,7 @@ import { ICoreSystem } from "../core_codegen/world/ICoreSystem.sol";
 import { IWorld } from "../core_codegen/world/IWorld.sol";
 import { PermissionsData, DefaultParameters, Position, PixelUpdateData, Pixel, PixelData, ERC20TokenBalance, UniversalRouterParams, TokenInfo } from "../core_codegen/index.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward } from "../codegen/index.sol";
+import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward, WeeklyRecord, WeeklyRecordData, ScoreToPointsRewards } from "../codegen/index.sol";
 import { IERC20 } from "@latticexyz/world-modules/src/modules/erc20-puppet/IERC20.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
@@ -16,14 +16,14 @@ import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
 import { IQuote, SwapParams, Quote } from "../interfaces/IQuote.sol";
 import { AccessControl } from "@latticexyz/world/src/AccessControl.sol";
 import { Check } from "../libraries/Check.sol";
+import { Utils } from "../libraries/Utils.sol";
 
 contract PopCraftSystem is System {
-
-  string constant APP_ICON = 'U+1F48E';
-  string constant NAMESPACE = 'popCraft';
-  string constant SYSTEM_NAME = 'PopCraftSystem';
-  string constant APP_NAME = 'PopCraft';
-  string constant APP_MANIFEST = 'BASE/PopCraftSystem';
+  string constant APP_ICON = "U+1F48E";
+  string constant NAMESPACE = "popCraft";
+  string constant SYSTEM_NAME = "PopCraftSystem";
+  string constant APP_NAME = "PopCraft";
+  string constant APP_MANIFEST = "BASE/PopCraftSystem";
   bytes14 constant BYTESNAMESPACE = bytes14(bytes(NAMESPACE));
 
   bytes32 bytes_name = converToBytes32("PopCraft");
@@ -41,8 +41,8 @@ contract PopCraftSystem is System {
     address owner = _msgSender();
     TCMPopStarData memory tcmPopStarData = TCMPopStar.get(owner);
 
-    if(tcmPopStarData.startTime > 0){
-      position = Position({x: tcmPopStarData.x, y: tcmPopStarData.y});
+    if (tcmPopStarData.startTime > 0) {
+      position = Position({ x: tcmPopStarData.x, y: tcmPopStarData.y });
     }
 
     {
@@ -54,42 +54,47 @@ contract PopCraftSystem is System {
       uint256 gameTimes = GameRecord.getTimes(owner);
       GameRecord.setTimes(owner, gameTimes += 1);
       RankingRecord.setLatestScores(owner, 0);
+      ScoreToPointsRewards.set(owner, false);
+      (uint256 csd, uint256 currentSeason) = Utils.getCurrentSeason();
+      if (csd > 0 && currentSeason > 0) {
+        uint256 currentSeasonGameTimes = WeeklyRecord.getTimes(owner, currentSeason, csd);
+        WeeklyRecord.setTimes(owner, currentSeason, csd, currentSeasonGameTimes + 1);
+        WeeklyRecord.setLatestScores(owner, currentSeason, csd, 0);
+      }
     }
   }
 
-  function shuffle() private view returns(uint256[] memory) {
+  function shuffle() private view returns (uint256[] memory) {
     uint256[] memory matrix = new uint256[](100);
     address sender = _msgSender();
     for (uint256 i = 0; i < 100; ) {
-        uint256 random_num = uint256(keccak256(abi.encodePacked(sender, block.timestamp, block.number, i))) % 5 + 1;
-        matrix[i] = random_num;
-        unchecked{
-          i++;
-        }
+      uint256 random_num = (uint256(keccak256(abi.encodePacked(sender, block.timestamp, block.number, i))) % 5) + 1;
+      matrix[i] = random_num;
+      unchecked {
+        i++;
+      }
     }
     return matrix;
   }
 
-  function randomTCMToken() private view returns(address[] memory) {
-
+  function randomTCMToken() private view returns (address[] memory) {
     address[] memory address_arr = new address[](5);
-  
     address[] memory tempValues = Token.get(0);
     uint256 n = tempValues.length;
 
     // Fisher-Yates shuffle
     for (uint256 i = 0; i < 5; i++) {
-        uint256 randIndex = uint256(keccak256(abi.encodePacked(block.timestamp, block.number, i))) % n;
-        address_arr[i] = tempValues[randIndex];
-        tempValues[randIndex] = tempValues[n - 1];
-        n--;
+      uint256 randIndex = uint256(keccak256(abi.encodePacked(block.timestamp, block.number, i))) % n;
+      address_arr[i] = tempValues[randIndex];
+      tempValues[randIndex] = tempValues[n - 1];
+      n--;
     }
     address KOALA = 0x0000000000000000000000000000000000000012;
-    for (uint256 i = 0; i < 5; i++){
-      if(address_arr[i] == KOALA){
+    for (uint256 i = 0; i < 5; i++) {
+      if (address_arr[i] == KOALA) {
         break;
-      }else{
-        if(i == 4){
+      } else {
+        if (i == 4) {
           address_arr[i] = KOALA;
         }
       }
@@ -139,14 +144,14 @@ contract PopCraftSystem is System {
       }
     } else {
       (matrix_array, eliminate_amount) = dfs(matrix_index, click_value, matrix_array, eliminate_amount);
-      comboReward(eliminate_amount, token_addr);
+      // comboReward(eliminate_amount, token_addr);
     }
 
     matrix_array = move(matrix_array);
 
     {
       bool game_finished = check_game_finished(matrix_array);
-      
+
       TCMPopStar.set(
         sender,
         tcmPopStarData.x,
@@ -160,9 +165,9 @@ contract PopCraftSystem is System {
       // game success
       if (game_finished) {
         _gameFinished();
-        updateRankRecord(eliminate_amount, true);
+        Utils.updateRankRecord(sender, eliminate_amount, true);
       } else {
-        updateRankRecord(eliminate_amount, false);
+        Utils.updateRankRecord(sender, eliminate_amount, false);
       }
     }
   }
@@ -171,16 +176,29 @@ contract PopCraftSystem is System {
     address sender = _msgSender();
     GameRecordData memory gameRecordData = GameRecord.get(sender);
     gameRecordData.unissuedRewards += 1;
-    GameRecord.set(sender, gameRecordData.times, gameRecordData.successTimes += 1, gameRecordData.unissuedRewards, gameRecordData.totalPoints+100);
+    GameRecord.set(
+      sender,
+      gameRecordData.times,
+      gameRecordData.successTimes += 1,
+      gameRecordData.unissuedRewards,
+      gameRecordData.totalPoints + 100
+    );
+
+    (uint256 csd, uint256 currentSeason) = Utils.getCurrentSeason();
+    if (csd > 0 && currentSeason > 0) {
+      WeeklyRecordData memory weeklyRecordData = WeeklyRecord.get(sender, currentSeason, csd);
+      WeeklyRecord.setSuccessTimes(sender, currentSeason, csd, weeklyRecordData.successTimes + 1);
+      WeeklyRecord.setTotalPoints(sender, currentSeason, csd, weeklyRecordData.totalPoints + 100);
+    }
   }
 
   function _useToken(address token_addr) private {
     address sender = _msgSender();
     uint256 token_balance = TokenBalance.get(sender, token_addr);
     uint8 token_decimals;
-    if(Check.checkIsPriToken(token_addr)){
-      token_decimals = 18; 
-    }else{
+    if (Check.checkIsPriToken(token_addr)) {
+      token_decimals = 18;
+    } else {
       token_decimals = IERC20(token_addr).decimals();
     }
     uint256 deduct_token_num = 10 ** uint256(token_decimals);
@@ -242,50 +260,18 @@ contract PopCraftSystem is System {
     return (matrix_array, eliminate_amount);
   }
 
-  function updateRankRecord(uint256 eliminateAmount, bool game_success) private {
-    uint256 score;
-    address owner = _msgSender();
-
-    if (eliminateAmount > 5) {
-      score = StarToScore.get(5) + StarToScore.get(0) * (eliminateAmount - 5);
-    } else {
-      score = StarToScore.get(eliminateAmount);
-    }
-    uint256 shortestTime = RankingRecord.getShortestTime(owner);
-    uint256 lastestScores = RankingRecord.getLatestScores(owner) + score;
-    uint256 totalScore = RankingRecord.getTotalScore(owner) + score;
-    uint256 highestScore = RankingRecord.getHighestScore(owner);
-
-    if (game_success) {
-      totalScore += StarToScore.get(101);
-      lastestScores += StarToScore.get(101);
-      uint256 startTime = TCMPopStar.getStartTime(owner);
-      uint256 successTime = block.timestamp - startTime;
-
-      if (successTime < shortestTime || shortestTime == 0) {
-        shortestTime = successTime;
-      }
-    }
-
-    if (lastestScores > highestScore) {
-      RankingRecord.set(owner, totalScore, lastestScores, lastestScores, shortestTime);
-    } else {
-      RankingRecord.set(owner, totalScore, highestScore, lastestScores, shortestTime);
-    }
-  }
-
-  function comboReward(uint256 eliminateAmount, address tokenAddr) private {
-    if(eliminateAmount >= 5){
-      uint256 amount = eliminateAmount / 5;
-      // add new token: change here
-      uint256 rewardTokenAmount = amount * 10 ** 18;
-      address sender = _msgSender();
-      ComboReward.set(sender, tokenAddr, ComboReward.get(sender, tokenAddr) + rewardTokenAmount);
-      TokenBalance.set(sender, tokenAddr, TokenBalance.get(sender, tokenAddr) + rewardTokenAmount);
-      TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
-      TokenSold.set(tokenAddr, tokenSoldData.soldNow + rewardTokenAmount, tokenSoldData.soldAll + rewardTokenAmount);
-    }
-  }
+  // function comboReward(uint256 eliminateAmount, address tokenAddr) private {
+  //   if (eliminateAmount >= 5) {
+  //     uint256 amount = eliminateAmount / 5;
+  //     // add new token: change here
+  //     uint256 rewardTokenAmount = amount * 10 ** 18;
+  //     address sender = _msgSender();
+  //     ComboReward.set(sender, tokenAddr, ComboReward.get(sender, tokenAddr) + rewardTokenAmount);
+  //     TokenBalance.set(sender, tokenAddr, TokenBalance.get(sender, tokenAddr) + rewardTokenAmount);
+  //     TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
+  //     TokenSold.set(tokenAddr, tokenSoldData.soldNow + rewardTokenAmount, tokenSoldData.soldAll + rewardTokenAmount);
+  //   }
+  // }
 
   function move(uint256[] memory matrix_array) private pure returns (uint256[] memory) {
     uint256 index;
