@@ -55,8 +55,11 @@ fi
 echo -e "Register app to World contract."
 # add new chain: change here
 # forge script script/${EXETENSION_FILE}.s.sol --rpc-url $RPC_URL --with-gas-price 0.002gwei --priority-gas-price 0.0001gwei --broadcast
-forge script script/${EXETENSION_FILE}.s.sol --rpc-url $RPC_URL --priority-gas-price 0.0001gwei --broadcast
-# forge script script/${EXETENSION_FILE}.s.sol --rpc-url $RPC_URL --broadcast
+# forge script script/${EXETENSION_FILE}.s.sol --rpc-url $RPC_URL --priority-gas-price 0.0001gwei --broadcast
+forge script script/${EXETENSION_FILE}.s.sol --rpc-url $RPC_URL --broadcast
+# forge script script/MissionExtension.s.sol --rpc-url https://rpc.morphl2.io --with-gas-price 0.002gwei --priority-gas-price 0.0001gwei --broadcast
+forge script script/MissionExtension.s.sol --rpc-url $RPC_URL --broadcast
+forge script script/PlantsExtension.s.sol --rpc-url $RPC_URL --broadcast
 sleep 1
 
 PRIVATE_KEY=$(grep -E "^PRIVATE_KEY=" .env | cut -d '=' -f2-)

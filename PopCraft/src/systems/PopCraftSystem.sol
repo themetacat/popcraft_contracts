@@ -6,7 +6,7 @@ import { ICoreSystem } from "../core_codegen/world/ICoreSystem.sol";
 import { IWorld } from "../core_codegen/world/IWorld.sol";
 import { PermissionsData, DefaultParameters, Position, PixelUpdateData, Pixel, PixelData, ERC20TokenBalance, UniversalRouterParams, TokenInfo } from "../core_codegen/index.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward, WeeklyRecord, WeeklyRecordData, ScoreToPointsRewards } from "../codegen/index.sol";
+import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward, WeeklyRecord, WeeklyRecordData, ScoreToPointsRewards, DailyGames, DailyGamesData } from "../codegen/index.sol";
 import { IERC20 } from "@latticexyz/world-modules/src/modules/erc20-puppet/IERC20.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
@@ -17,24 +17,23 @@ import { IQuote, SwapParams, Quote } from "../interfaces/IQuote.sol";
 import { AccessControl } from "@latticexyz/world/src/AccessControl.sol";
 import { Check } from "../libraries/Check.sol";
 import { Utils } from "../libraries/Utils.sol";
+import { PopCraftUtils } from "../libraries/PopCraftUtils.sol";
 
 contract PopCraftSystem is System {
-  string constant APP_ICON = "U+1F48E";
-  string constant NAMESPACE = "popCraft";
-  string constant SYSTEM_NAME = "PopCraftSystem";
-  string constant APP_NAME = "PopCraft";
-  string constant APP_MANIFEST = "BASE/PopCraftSystem";
-  bytes14 constant BYTESNAMESPACE = bytes14(bytes(NAMESPACE));
-
-  bytes32 bytes_name = converToBytes32("PopCraft");
+  // string constant APP_ICON = "U+1F48E";
+  // string constant NAMESPACE = "popCraft";
+  // string constant SYSTEM_NAME = "PopCraftSystem";
+  // string constant APP_NAME = "PopCraft";
+  // string constant APP_MANIFEST = "BASE/PopCraftSystem";
+  // bytes14 constant BYTESNAMESPACE = bytes14(bytes(NAMESPACE));
 
   error InsufficientBalance(address);
 
   receive() external payable {}
 
-  function init() public {
-    ICoreSystem(_world()).update_app(APP_NAME, APP_ICON, APP_MANIFEST, NAMESPACE, SYSTEM_NAME);
-  }
+  // function init() public {
+  //   ICoreSystem(_world()).update_app(APP_NAME, APP_ICON, APP_MANIFEST, NAMESPACE, SYSTEM_NAME);
+  // }
 
   function interact(DefaultParameters memory default_parameters) public {
     Position memory position = default_parameters.position;
@@ -47,14 +46,16 @@ contract PopCraftSystem is System {
 
     {
       uint256 timestamp = block.timestamp;
-      uint256[] memory matrix = shuffle();
-      address[] memory tokenAddressArr = randomTCMToken();
+      uint256[] memory matrix = PopCraftUtils.shuffle(owner);
+      address[] memory tokenAddressArr = PopCraftUtils.randomTCMToken();
 
       TCMPopStar.set(owner, position.x, position.y, timestamp, false, matrix, tokenAddressArr);
       uint256 gameTimes = GameRecord.getTimes(owner);
       GameRecord.setTimes(owner, gameTimes += 1);
       RankingRecord.setLatestScores(owner, 0);
       ScoreToPointsRewards.set(owner, false);
+      DailyGames.setAdded(owner, false);
+      
       (uint256 csd, uint256 currentSeason) = Utils.getCurrentSeason();
       if (csd > 0 && currentSeason > 0) {
         uint256 currentSeasonGameTimes = WeeklyRecord.getTimes(owner, currentSeason, csd);
@@ -144,7 +145,7 @@ contract PopCraftSystem is System {
       }
     } else {
       (matrix_array, eliminate_amount) = dfs(matrix_index, click_value, matrix_array, eliminate_amount);
-      // comboReward(eliminate_amount, token_addr);
+      comboReward(eliminate_amount, token_addr);
     }
 
     matrix_array = move(matrix_array);
@@ -169,6 +170,7 @@ contract PopCraftSystem is System {
       } else {
         Utils.updateRankRecord(sender, eliminate_amount, false);
       }
+      updatePlayerDailyGames();
     }
   }
 
@@ -260,18 +262,18 @@ contract PopCraftSystem is System {
     return (matrix_array, eliminate_amount);
   }
 
-  // function comboReward(uint256 eliminateAmount, address tokenAddr) private {
-  //   if (eliminateAmount >= 5) {
-  //     uint256 amount = eliminateAmount / 5;
-  //     // add new token: change here
-  //     uint256 rewardTokenAmount = amount * 10 ** 18;
-  //     address sender = _msgSender();
-  //     ComboReward.set(sender, tokenAddr, ComboReward.get(sender, tokenAddr) + rewardTokenAmount);
-  //     TokenBalance.set(sender, tokenAddr, TokenBalance.get(sender, tokenAddr) + rewardTokenAmount);
-  //     TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
-  //     TokenSold.set(tokenAddr, tokenSoldData.soldNow + rewardTokenAmount, tokenSoldData.soldAll + rewardTokenAmount);
-  //   }
-  // }
+  function comboReward(uint256 eliminateAmount, address tokenAddr) private {
+    if (eliminateAmount >= 5) {
+      uint256 amount = eliminateAmount / 5;
+      // add new token: change here
+      uint256 rewardTokenAmount = amount * 10 ** 18;
+      address sender = _msgSender();
+      ComboReward.set(sender, tokenAddr, ComboReward.get(sender, tokenAddr) + rewardTokenAmount);
+      TokenBalance.set(sender, tokenAddr, TokenBalance.get(sender, tokenAddr) + rewardTokenAmount);
+      TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
+      TokenSold.set(tokenAddr, tokenSoldData.soldNow + rewardTokenAmount, tokenSoldData.soldAll + rewardTokenAmount);
+    }
+  }
 
   function move(uint256[] memory matrix_array) private pure returns (uint256[] memory) {
     uint256 index;
@@ -397,10 +399,10 @@ contract PopCraftSystem is System {
       UniversalRouterParams[] memory priResultParams,
       uint256 valuePri
     ) = Check.dealUniversalRouterParams(universalRouterParams);
-    require(_msgValue() >= value + valuePri, "Insufficient payment amount");
+    require(_msgValue() >= value + valuePri, "Insufficient");
     Check.checkPriTokenPirce(priResultParams, valuePri);
 
-    require(resultParams.length == 0, "should be no token");
+    require(resultParams.length == 0, "token > 0");
 
     for (uint256 i; i < router_params_length; i++) {
       address token_addr = universalRouterParams[i].token_info.token_addr;
@@ -445,5 +447,30 @@ contract PopCraftSystem is System {
       TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
       TokenSold.set(tokenAddr, tokenSoldData.soldNow + benefitsAmount, tokenSoldData.soldAll + benefitsAmount);
     }
+  }
+
+  function updatePlayerDailyGames() private {
+    
+    address player = _msgSender();
+    DailyGamesData memory dailyGamesData = DailyGames.get(player);
+    
+    if(dailyGamesData.added || RankingRecord.getLatestScores(player) < 200){
+      return;
+    }
+    uint256 currentDay = Utils.getCurrentDayFromDailyGames();
+    if(currentDay == 0){
+      return;
+    }
+    uint256 games = dailyGamesData.games;
+    uint256 day = dailyGamesData.day;
+    uint256 received = dailyGamesData.received;
+    if(day == currentDay){
+      games += 1;
+    }else{
+      games = 1;
+      day = currentDay;
+      received = 0;
+    }
+    DailyGames.set(player, games, day, received, true);
   }
 }

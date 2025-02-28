@@ -21,6 +21,9 @@ import { WeeklyRecord, WeeklyRecordData, WeeklyRecordTableId } from "./tables/We
 import { SeasonPlantsRecord, SeasonPlantsRecordTableId } from "./tables/SeasonPlantsRecord.sol";
 import { ScoreToPointsRewards, ScoreToPointsRewardsTableId } from "./tables/ScoreToPointsRewards.sol";
 import { ScoreToPoints, ScoreToPointsTableId } from "./tables/ScoreToPoints.sol";
+import { DailyGames, DailyGamesData, DailyGamesTableId } from "./tables/DailyGames.sol";
+import { TheDailyGamesStartTime, TheDailyGamesStartTimeTableId } from "./tables/TheDailyGamesStartTime.sol";
+import { GamesRewardsScores, GamesRewardsScoresTableId } from "./tables/GamesRewardsScores.sol";
 import { Plants, PlantsData, PlantsTableId } from "./tables/Plants.sol";
 import { TotalPlants, TotalPlantsTableId } from "./tables/TotalPlants.sol";
 import { PlantsLevel, PlantsLevelData, PlantsLevelTableId } from "./tables/PlantsLevel.sol";

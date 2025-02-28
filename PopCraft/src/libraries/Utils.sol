@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.21;
 
-import { WeeklyRecord, CurrentSeasonDimension, SeasonTime, SeasonTimeData, RankingRecord, StarToScore, WeeklyRecordData, TCMPopStar, ScoreToPointsRewards, GameRecord, RankingRecordData, ScoreToPoints } from "../codegen/index.sol";
+import { WeeklyRecord, CurrentSeasonDimension, SeasonTime, SeasonTimeData, RankingRecord, StarToScore, WeeklyRecordData, TCMPopStar, ScoreToPointsRewards, GameRecord, RankingRecordData, ScoreToPoints, DailyGames } from "../codegen/index.sol";
 
 library Utils {
   function getCurrentSeason() internal view returns (uint256, uint256) {
@@ -90,5 +90,16 @@ library Utils {
       );
     }
   }
+
+  function getCurrentDayFromDailyGames() internal view returns(uint256) {
+    SeasonTimeData memory seasonTimeData = SeasonTime.get(2);
+    if (block.timestamp < seasonTimeData.startTime || seasonTimeData.duration == 0) {
+      return 0;
+    }
+    uint256 currentDay = (block.timestamp - seasonTimeData.startTime) / seasonTimeData.duration + 1;
+    return currentDay;
+  }
+
+
 
 }
