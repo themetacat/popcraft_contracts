@@ -5,9 +5,8 @@ library Random {
   /*
    * not real random
    */
-  function getRandomNumber(uint256 i, address sender) internal view returns (uint256) {
+  function getRandomNumber(uint256 i, address sender) public view returns (uint256) {
     return uint256(keccak256(abi.encode(block.timestamp, block.number, i, sender)));
   }
 
-  
 }

@@ -15,7 +15,7 @@ import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
 import { IStore } from "@latticexyz/store/src/IStore.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 import { DefaultParameters } from "../src/core_codegen/index.sol";
-import { TCMPopStar, GameRecord, TokenSold, TokenBalance, StarToScore, DayToScore, RankingRecord, Token, OverTime, PriTokenPrice, UserBenefitsToken, ComboReward, SeasonTime, CurrentSeasonDimension, WeeklyRecord, ScoreToPoints, ScoreToPointsRewards } from "../src/codegen/index.sol";
+import { TCMPopStar, GameRecord, TokenSold, TokenBalance, StarToScore, DayToScore, RankingRecord, Token, OverTime, PriTokenPrice, UserBenefitsToken, ComboReward, SeasonTime, CurrentSeasonDimension, WeeklyRecord, ScoreToPoints, ScoreToPointsRewards, ComboRewardGames } from "../src/codegen/index.sol";
 // import { TokenSold } from "../src/codegen/index.sol";
 // import { TokenBalance } from "../src/codegen/index.sol";
 import { PopCraftSystem } from "../src/systems/PopCraftSystem.sol";
@@ -48,17 +48,20 @@ contract PopCraftExtension is Script {
     Token.register();
     OverTime.register();
     PriTokenPrice.register();
-    UserBenefitsToken.register();
     ComboReward.register();
     ScoreToPointsRewards.register();
     SeasonTime.register();
     CurrentSeasonDimension.register();
     WeeklyRecord.register();
     ScoreToPoints.register();
+    ComboRewardGames.register();
 
     ScoreToPoints.set(250, 50);
-    SeasonTime.set(1, 1740060000, 604800); // week
+    SeasonTime.set(1, 1740060000, 604800); // week weeklyRecord
     CurrentSeasonDimension.set(0, 1); // current: week
+
+    // comboReward startTime 
+    SeasonTime.set(5, 1741269600, 86400);
 
     OverTime.set(0, 122);
 

@@ -2,19 +2,19 @@
 pragma solidity >=0.8.21;
 
 import { System } from "@latticexyz/world/src/System.sol";
-import { ICoreSystem } from "../core_codegen/world/ICoreSystem.sol";
-import { IWorld } from "../core_codegen/world/IWorld.sol";
-import { PermissionsData, DefaultParameters, Position, PixelUpdateData, Pixel, PixelData, ERC20TokenBalance, UniversalRouterParams, TokenInfo } from "../core_codegen/index.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, StarToScore, DayToScore, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward, WeeklyRecord, WeeklyRecordData, ScoreToPointsRewards, DailyGames, DailyGamesData } from "../codegen/index.sol";
+// import { ICoreSystem } from "../core_codegen/world/ICoreSystem.sol";
+// import { IWorld } from "../core_codegen/world/IWorld.sol";
+import { DefaultParameters, Position, ERC20TokenBalance, UniversalRouterParams } from "../core_codegen/index.sol";
+// import "@openzeppelin/contracts/utils/Strings.sol";
+import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward, WeeklyRecord, WeeklyRecordData, ScoreToPointsRewards, DailyGames, DailyGamesData, StreakDays, StreakDaysData, ComboRewardGames, ComboRewardGamesData } from "../codegen/index.sol";
 import { IERC20 } from "@latticexyz/world-modules/src/modules/erc20-puppet/IERC20.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
-import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
-import { Puppet } from "@latticexyz/world-modules/src/modules/puppet/Puppet.sol";
-import { WorldContextConsumerLib } from "@latticexyz/world/src/WorldContext.sol";
-import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
-import { IQuote, SwapParams, Quote } from "../interfaces/IQuote.sol";
-import { AccessControl } from "@latticexyz/world/src/AccessControl.sol";
+// import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
+// import { Puppet } from "@latticexyz/world-modules/src/modules/puppet/Puppet.sol";
+// import { WorldContextConsumerLib } from "@latticexyz/world/src/WorldContext.sol";
+// import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
+// import { IQuote, SwapParams, Quote } from "../interfaces/IQuote.sol";
+// import { AccessControl } from "@latticexyz/world/src/AccessControl.sol";
 import { Check } from "../libraries/Check.sol";
 import { Utils } from "../libraries/Utils.sol";
 import { PopCraftUtils } from "../libraries/PopCraftUtils.sol";
@@ -55,53 +55,30 @@ contract PopCraftSystem is System {
       RankingRecord.setLatestScores(owner, 0);
       ScoreToPointsRewards.set(owner, false);
       DailyGames.setAdded(owner, false);
-      
+
       (uint256 csd, uint256 currentSeason) = Utils.getCurrentSeason();
       if (csd > 0 && currentSeason > 0) {
         uint256 currentSeasonGameTimes = WeeklyRecord.getTimes(owner, currentSeason, csd);
         WeeklyRecord.setTimes(owner, currentSeason, csd, currentSeasonGameTimes + 1);
         WeeklyRecord.setLatestScores(owner, currentSeason, csd, 0);
       }
+
+      updateComboRewardGames();
     }
   }
 
-  function shuffle() private view returns (uint256[] memory) {
-    uint256[] memory matrix = new uint256[](100);
-    address sender = _msgSender();
-    for (uint256 i = 0; i < 100; ) {
-      uint256 random_num = (uint256(keccak256(abi.encodePacked(sender, block.timestamp, block.number, i))) % 5) + 1;
-      matrix[i] = random_num;
-      unchecked {
-        i++;
-      }
-    }
-    return matrix;
-  }
-
-  function randomTCMToken() private view returns (address[] memory) {
-    address[] memory address_arr = new address[](5);
-    address[] memory tempValues = Token.get(0);
-    uint256 n = tempValues.length;
-
-    // Fisher-Yates shuffle
-    for (uint256 i = 0; i < 5; i++) {
-      uint256 randIndex = uint256(keccak256(abi.encodePacked(block.timestamp, block.number, i))) % n;
-      address_arr[i] = tempValues[randIndex];
-      tempValues[randIndex] = tempValues[n - 1];
-      n--;
-    }
-    address KOALA = 0x0000000000000000000000000000000000000012;
-    for (uint256 i = 0; i < 5; i++) {
-      if (address_arr[i] == KOALA) {
-        break;
-      } else {
-        if (i == 4) {
-          address_arr[i] = KOALA;
-        }
-      }
-    }
-    return address_arr;
-  }
+  // function shuffle() private view returns (uint256[] memory) {
+  //   uint256[] memory matrix = new uint256[](100);
+  //   address sender = _msgSender();
+  //   for (uint256 i = 0; i < 100; ) {
+  //     uint256 random_num = (uint256(keccak256(abi.encodePacked(sender, block.timestamp, block.number, i))) % 5) + 1;
+  //     matrix[i] = random_num;
+  //     unchecked {
+  //       i++;
+  //     }
+  //   }
+  //   return matrix;
+  // }
 
   function pop(DefaultParameters memory default_parameters) public {
     Position memory position = default_parameters.position;
@@ -133,7 +110,7 @@ contract PopCraftSystem is System {
     if (click_value == 0) revert("Please click on the star");
     uint256 eliminate_amount;
 
-    bool pop_access = check_pop_access(matrix_index, click_value, matrix_array);
+    bool pop_access = Check.check_pop_access(matrix_index, click_value, matrix_array);
     address token_addr = tcmPopStarData.tokenAddressArr[click_value - 1];
 
     if (!pop_access) {
@@ -144,14 +121,14 @@ contract PopCraftSystem is System {
         eliminate_amount = 1;
       }
     } else {
-      (matrix_array, eliminate_amount) = dfs(matrix_index, click_value, matrix_array, eliminate_amount);
+      (matrix_array, eliminate_amount) = Utils.dfs(matrix_index, click_value, matrix_array, eliminate_amount);
       comboReward(eliminate_amount, token_addr);
     }
 
     matrix_array = move(matrix_array);
 
     {
-      bool game_finished = check_game_finished(matrix_array);
+      bool game_finished = Check.check_game_finished(matrix_array);
 
       TCMPopStar.set(
         sender,
@@ -171,6 +148,7 @@ contract PopCraftSystem is System {
         Utils.updateRankRecord(sender, eliminate_amount, false);
       }
       updatePlayerDailyGames();
+      updateStreakDays();
     }
   }
 
@@ -213,61 +191,62 @@ contract PopCraftSystem is System {
     TokenBalance.set(sender, token_addr, token_balance - deduct_token_num);
   }
 
-  function dfs(
-    uint256 matrix_index,
-    uint256 target_value,
-    uint256[] memory matrix_array,
-    uint256 eliminate_amount
-  ) private returns (uint256[] memory, uint256) {
-    uint256 x = matrix_index % 10;
-    uint256 y = matrix_index / 10;
+  // function dfs(
+  //   uint256 matrix_index,
+  //   uint256 target_value,
+  //   uint256[] memory matrix_array,
+  //   uint256 eliminate_amount
+  // ) private returns (uint256[] memory, uint256) {
+  //   uint256 x = matrix_index % 10;
+  //   uint256 y = matrix_index / 10;
 
-    uint256 index;
-    if (x > 0) {
-      index = matrix_index - 1;
-      if (matrix_array[index] == target_value) {
-        matrix_array[index] = 0;
-        eliminate_amount += 1;
-        (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
-      }
-    }
+  //   uint256 index;
+  //   if (x > 0) {
+  //     index = matrix_index - 1;
+  //     if (matrix_array[index] == target_value) {
+  //       matrix_array[index] = 0;
+  //       eliminate_amount += 1;
+  //       (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
+  //     }
+  //   }
 
-    if (x < 9) {
-      index = matrix_index + 1;
-      if (matrix_array[index] == target_value) {
-        matrix_array[index] = 0;
-        eliminate_amount += 1;
-        (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
-      }
-    }
+  //   if (x < 9) {
+  //     index = matrix_index + 1;
+  //     if (matrix_array[index] == target_value) {
+  //       matrix_array[index] = 0;
+  //       eliminate_amount += 1;
+  //       (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
+  //     }
+  //   }
 
-    if (y > 0) {
-      index = matrix_index - 10;
-      if (matrix_array[index] == target_value) {
-        matrix_array[index] = 0;
-        eliminate_amount += 1;
-        (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
-      }
-    }
+  //   if (y > 0) {
+  //     index = matrix_index - 10;
+  //     if (matrix_array[index] == target_value) {
+  //       matrix_array[index] = 0;
+  //       eliminate_amount += 1;
+  //       (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
+  //     }
+  //   }
 
-    if (y < 9) {
-      index = matrix_index + 10;
-      if (matrix_array[index] == target_value) {
-        matrix_array[index] = 0;
-        eliminate_amount += 1;
-        (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
-      }
-    }
+  //   if (y < 9) {
+  //     index = matrix_index + 10;
+  //     if (matrix_array[index] == target_value) {
+  //       matrix_array[index] = 0;
+  //       eliminate_amount += 1;
+  //       (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
+  //     }
+  //   }
 
-    return (matrix_array, eliminate_amount);
-  }
+  //   return (matrix_array, eliminate_amount);
+  // }
 
   function comboReward(uint256 eliminateAmount, address tokenAddr) private {
-    if (eliminateAmount >= 5) {
+    address sender = _msgSender();
+    bool eligibility = Check.checkComboRewardEligibility(sender);
+    if (eliminateAmount >= 5 && eligibility) {
       uint256 amount = eliminateAmount / 5;
       // add new token: change here
       uint256 rewardTokenAmount = amount * 10 ** 18;
-      address sender = _msgSender();
       ComboReward.set(sender, tokenAddr, ComboReward.get(sender, tokenAddr) + rewardTokenAmount);
       TokenBalance.set(sender, tokenAddr, TokenBalance.get(sender, tokenAddr) + rewardTokenAmount);
       TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
@@ -325,69 +304,57 @@ contract PopCraftSystem is System {
     return matrix_array;
   }
 
-  function check_pop_access(
-    uint256 matrix_index,
-    uint256 target_value,
-    uint256[] memory matrix_array
-  ) private pure returns (bool) {
-    uint256 x = matrix_index % 10;
-    uint256 y = matrix_index / 10;
+  // function check_pop_access(
+  //   uint256 matrix_index,
+  //   uint256 target_value,
+  //   uint256[] memory matrix_array
+  // ) private pure returns (bool) {
+  //   uint256 x = matrix_index % 10;
+  //   uint256 y = matrix_index / 10;
 
-    uint256 index;
-    if (x > 0) {
-      index = matrix_index - 1;
-      if (matrix_array[index] == target_value) {
-        return true;
-      }
-    }
+  //   uint256 index;
+  //   if (x > 0) {
+  //     index = matrix_index - 1;
+  //     if (matrix_array[index] == target_value) {
+  //       return true;
+  //     }
+  //   }
 
-    if (x < 9) {
-      index = matrix_index + 1;
-      if (matrix_array[index] == target_value) {
-        return true;
-      }
-    }
+  //   if (x < 9) {
+  //     index = matrix_index + 1;
+  //     if (matrix_array[index] == target_value) {
+  //       return true;
+  //     }
+  //   }
 
-    if (y > 0) {
-      index = matrix_index - 10;
-      if (matrix_array[index] == target_value) {
-        return true;
-      }
-    }
+  //   if (y > 0) {
+  //     index = matrix_index - 10;
+  //     if (matrix_array[index] == target_value) {
+  //       return true;
+  //     }
+  //   }
 
-    if (y < 9) {
-      index = matrix_index + 10;
-      if (matrix_array[index] == target_value) {
-        return true;
-      }
-    }
+  //   if (y < 9) {
+  //     index = matrix_index + 10;
+  //     if (matrix_array[index] == target_value) {
+  //       return true;
+  //     }
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
-  function check_game_finished(uint256[] memory matrix_array) private pure returns (bool) {
-    unchecked {
-      for (uint256 i; i < 99; ) {
-        if (matrix_array[i] != 0) {
-          return false;
-        }
-        i++;
-      }
-    }
-    return true;
-  }
-
-  function converToBytes32(string memory input) private pure returns (bytes32) {
-    bytes memory stringBytes = bytes(input);
-    if (stringBytes.length == 0) {
-      return 0x0;
-    }
-    bytes32 result;
-    assembly {
-      result := mload(add(stringBytes, 32))
-    }
-    return result;
-  }
+  // function check_game_finished(uint256[] memory matrix_array) private pure returns (bool) {
+  //   unchecked {
+  //     for (uint256 i; i < 99; ) {
+  //       if (matrix_array[i] != 0) {
+  //         return false;
+  //       }
+  //       i++;
+  //     }
+  //   }
+  //   return true;
+  // }
 
   function buyToken(UniversalRouterParams[] calldata universalRouterParams) public payable {
     uint256 router_params_length = universalRouterParams.length;
@@ -431,46 +398,101 @@ contract PopCraftSystem is System {
   // }
   // }
 
-  function getUserBenefitsToken() public {
-    address user = _msgSender();
+  // function getUserBenefitsToken() public {
+  //   address user = _msgSender();
 
-    require(!UserBenefitsToken.get(user), "Already obtained");
+  //   require(!UserBenefitsToken.get(user), "Already obtained");
 
-    UserBenefitsToken.set(user, true);
-    address[] memory priTokenAddr = Token.get(1);
-    uint256 priTokenAddrLength = priTokenAddr.length;
-    uint256 benefitsAmount = 2 * 10 ** 18;
-    for (uint256 i; i < priTokenAddrLength; i++) {
-      address tokenAddr = priTokenAddr[i];
-      TokenBalance.set(user, tokenAddr, TokenBalance.get(user, tokenAddr) + benefitsAmount);
+  //   UserBenefitsToken.set(user, true);
+  //   address[] memory priTokenAddr = Token.get(1);
+  //   uint256 priTokenAddrLength = priTokenAddr.length;
+  //   uint256 benefitsAmount = 2 * 10 ** 18;
+  //   for (uint256 i; i < priTokenAddrLength; i++) {
+  //     address tokenAddr = priTokenAddr[i];
+  //     TokenBalance.set(user, tokenAddr, TokenBalance.get(user, tokenAddr) + benefitsAmount);
 
-      TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
-      TokenSold.set(tokenAddr, tokenSoldData.soldNow + benefitsAmount, tokenSoldData.soldAll + benefitsAmount);
-    }
-  }
+  //     TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
+  //     TokenSold.set(tokenAddr, tokenSoldData.soldNow + benefitsAmount, tokenSoldData.soldAll + benefitsAmount);
+  //   }
+  // }
 
   function updatePlayerDailyGames() private {
-    
     address player = _msgSender();
     DailyGamesData memory dailyGamesData = DailyGames.get(player);
-    
-    if(dailyGamesData.added || RankingRecord.getLatestScores(player) < 200){
+
+    if (dailyGamesData.added || RankingRecord.getLatestScores(player) < 200) {
       return;
     }
     uint256 currentDay = Utils.getCurrentDayFromDailyGames();
-    if(currentDay == 0){
+    if (currentDay == 0) {
       return;
     }
     uint256 games = dailyGamesData.games;
     uint256 day = dailyGamesData.day;
     uint256 received = dailyGamesData.received;
-    if(day == currentDay){
+    if (day == currentDay) {
       games += 1;
-    }else{
+    } else {
       games = 1;
       day = currentDay;
       received = 0;
     }
     DailyGames.set(player, games, day, received, true);
+  }
+
+  function updateStreakDays() private {
+    address player = _msgSender();
+    if (RankingRecord.getLatestScores(player) < 200) {
+      return;
+    }
+
+    StreakDaysData memory streakDaysData = StreakDays.get(player);
+    (uint256 totalCycleTimes, uint256 timesInCurrentCycle) = Utils.getCurrentSteakDayData();
+    if (
+      totalCycleTimes == 0 ||
+      timesInCurrentCycle == 0 ||
+      (streakDaysData.addedDays == timesInCurrentCycle && streakDaysData.addedCycle == totalCycleTimes)
+    ) {
+      return;
+    }
+
+    uint256 times = streakDaysData.times;
+    uint256 received = streakDaysData.received;
+    if (totalCycleTimes == streakDaysData.cycle && timesInCurrentCycle - streakDaysData.addedDays == 1) {
+      times += 1;
+      streakDaysData.totalTimes += 1;
+    } else {
+      times = 1;
+      received = 0;
+      if (totalCycleTimes - streakDaysData.cycle == 1 && timesInCurrentCycle == 1) {
+        streakDaysData.totalTimes += 1;
+      } else {
+        streakDaysData.totalTimes = 1;
+      }
+    }
+    StreakDays.set(
+      player,
+      times,
+      streakDaysData.totalTimes,
+      received,
+      streakDaysData.totalReceived,
+      totalCycleTimes,
+      totalCycleTimes,
+      timesInCurrentCycle
+    );
+  }
+
+  function updateComboRewardGames() private {
+    address player = _msgSender();
+    uint256 currentDay = Utils.getCurrentDayCommon(5);
+    if(currentDay == 0){
+      return;
+    }
+    ComboRewardGamesData memory comboRewardGamesData = ComboRewardGames.get(player);
+    if (comboRewardGamesData.addedTime == currentDay) {
+      ComboRewardGames.setGames(player, comboRewardGamesData.games + 1);
+    } else {
+      ComboRewardGames.set(player, 1, currentDay);
+    }
   }
 }

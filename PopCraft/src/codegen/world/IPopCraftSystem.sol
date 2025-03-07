@@ -12,13 +12,9 @@ import { DefaultParameters, UniversalRouterParams } from "./../../core_codegen/i
 interface IPopCraftSystem {
   error InsufficientBalance(address);
 
-  function popCraft_PopCraftSystem_init() external;
-
   function popCraft_PopCraftSystem_interact(DefaultParameters memory default_parameters) external;
 
   function popCraft_PopCraftSystem_pop(DefaultParameters memory default_parameters) external;
 
   function popCraft_PopCraftSystem_buyToken(UniversalRouterParams[] calldata universalRouterParams) external payable;
-
-  function popCraft_PopCraftSystem_getUserBenefitsToken() external;
 }

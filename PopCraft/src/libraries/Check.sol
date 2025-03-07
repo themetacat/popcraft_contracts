@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.21;
 
-import { RankingRecord, PlantsLevel, PlantsLevelData, PlayerPlantingRecord, Token, PriTokenPrice } from "../codegen/index.sol";
+import { RankingRecord, PlantsLevel, PlantsLevelData, PlayerPlantingRecord, Token, PriTokenPrice, ComboRewardGames, ComboRewardGamesData, SeasonTime, SeasonTimeData } from "../codegen/index.sol";
 import { UniversalRouterParams } from "../core_codegen/index.sol";
+import { Utils } from "./Utils.sol";
 
 library Check {
   function checkScoreSufficiency(
@@ -94,7 +95,9 @@ library Check {
     uint256 pararmLength = priResultParams.length;
     uint256 totalPrice;
     for (uint256 i; i < pararmLength; i++) {
-      totalPrice += PriTokenPrice.get(priResultParams[i].token_info.token_addr) * priResultParams[i].token_info.amount /1e18;
+      totalPrice +=
+        (PriTokenPrice.get(priResultParams[i].token_info.token_addr) * priResultParams[i].token_info.amount) /
+        1e18;
     }
     require(totalPrice == value, "Insufficient payment amount");
   }
@@ -108,5 +111,69 @@ library Check {
       }
     }
     return false;
+  }
+
+  function check_pop_access(
+    uint256 matrix_index,
+    uint256 target_value,
+    uint256[] memory matrix_array
+  ) public pure returns (bool) {
+    uint256 x = matrix_index % 10;
+    uint256 y = matrix_index / 10;
+
+    uint256 index;
+    if (x > 0) {
+      index = matrix_index - 1;
+      if (matrix_array[index] == target_value) {
+        return true;
+      }
+    }
+
+    if (x < 9) {
+      index = matrix_index + 1;
+      if (matrix_array[index] == target_value) {
+        return true;
+      }
+    }
+
+    if (y > 0) {
+      index = matrix_index - 10;
+      if (matrix_array[index] == target_value) {
+        return true;
+      }
+    }
+
+    if (y < 9) {
+      index = matrix_index + 10;
+      if (matrix_array[index] == target_value) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function check_game_finished(uint256[] memory matrix_array) public pure returns (bool) {
+    unchecked {
+      for (uint256 i; i < 99; ) {
+        if (matrix_array[i] != 0) {
+          return false;
+        }
+        i++;
+      }
+    }
+    return true;
+  }
+
+  function checkComboRewardEligibility(address player) public view returns (bool) {
+    uint256 currentDay = Utils.getCurrentDayCommon(5);
+    if(currentDay == 0){
+      return true;
+    }
+    ComboRewardGamesData memory comboRewardGamesData = ComboRewardGames.get(player);
+    if(comboRewardGamesData.addedTime == currentDay && comboRewardGamesData.games >3){
+      return false;
+    }
+    return true;
   }
 }

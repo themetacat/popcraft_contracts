@@ -15,6 +15,7 @@ import { PriTokenPrice, PriTokenPriceTableId } from "./tables/PriTokenPrice.sol"
 import { OverTime, OverTimeTableId } from "./tables/OverTime.sol";
 import { UserBenefitsToken, UserBenefitsTokenTableId } from "./tables/UserBenefitsToken.sol";
 import { ComboReward, ComboRewardTableId } from "./tables/ComboReward.sol";
+import { ComboRewardGames, ComboRewardGamesData, ComboRewardGamesTableId } from "./tables/ComboRewardGames.sol";
 import { SeasonTime, SeasonTimeData, SeasonTimeTableId } from "./tables/SeasonTime.sol";
 import { CurrentSeasonDimension, CurrentSeasonDimensionTableId } from "./tables/CurrentSeasonDimension.sol";
 import { WeeklyRecord, WeeklyRecordData, WeeklyRecordTableId } from "./tables/WeeklyRecord.sol";
@@ -22,7 +23,7 @@ import { SeasonPlantsRecord, SeasonPlantsRecordTableId } from "./tables/SeasonPl
 import { ScoreToPointsRewards, ScoreToPointsRewardsTableId } from "./tables/ScoreToPointsRewards.sol";
 import { ScoreToPoints, ScoreToPointsTableId } from "./tables/ScoreToPoints.sol";
 import { DailyGames, DailyGamesData, DailyGamesTableId } from "./tables/DailyGames.sol";
-import { TheDailyGamesStartTime, TheDailyGamesStartTimeTableId } from "./tables/TheDailyGamesStartTime.sol";
+import { StreakDays, StreakDaysData, StreakDaysTableId } from "./tables/StreakDays.sol";
 import { GamesRewardsScores, GamesRewardsScoresTableId } from "./tables/GamesRewardsScores.sol";
 import { Plants, PlantsData, PlantsTableId } from "./tables/Plants.sol";
 import { TotalPlants, TotalPlantsTableId } from "./tables/TotalPlants.sol";

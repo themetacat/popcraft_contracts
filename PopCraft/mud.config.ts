@@ -113,6 +113,15 @@ export default mudConfig({
         amount: "uint256"
       }
     },
+    ComboRewardGames: {
+      keySchema: {
+        owner: "address",
+      },
+      valueSchema: {
+        games: "uint256",
+        addedTime: "uint256"
+      }
+    },
     SeasonTime: {
       keySchema: {
         dimension: "uint256"
@@ -183,6 +192,20 @@ export default mudConfig({
         day: "uint256",
         received: "uint256",
         added: "bool"
+      }
+    },
+    StreakDays: {
+      keySchema: {
+        player: "address" 
+      },
+      valueSchema: {
+        times: "uint256",
+        totalTimes: "uint256",
+        received: "uint256",
+        totalReceived: "uint256",
+        cycle: "uint256",
+        addedCycle: "uint256",
+        addedDays: "uint256"
       }
     },
     GamesRewardsScores: {

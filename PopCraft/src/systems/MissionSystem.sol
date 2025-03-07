@@ -2,7 +2,7 @@
 pragma solidity >=0.8.21;
 
 import { System } from "@latticexyz/world/src/System.sol";
-import { DailyGames, DailyGamesData, GamesRewardsScores, WeeklyRecord, RankingRecord } from "../codegen/index.sol";
+import { DailyGames, DailyGamesData, GamesRewardsScores, WeeklyRecord, RankingRecord, StreakDays, StreakDaysData } from "../codegen/index.sol";
 import { Check } from "../libraries/Check.sol";
 import { Utils } from "../libraries/Utils.sol";
 
@@ -33,4 +33,52 @@ contract MissionSystem is System {
     }
     DailyGames.setReceived(player, games);
   }
+
+  function getStreakDaysRewards() public {
+    address player = _msgSender();
+    StreakDaysData memory streakDaysData = StreakDays.get(player);
+
+    (uint256 totalCycleTimes, uint256 timesInCurrentCycle) = Utils.getCurrentSteakDayData();
+    require(totalCycleTimes == streakDaysData.cycle && timesInCurrentCycle - streakDaysData.addedDays <= 1, "Not eligible");
+
+    uint256 times = streakDaysData.times;
+    uint256 received = streakDaysData.received;
+
+    if (times > 7) {
+      times = 7;
+    }
+    require(times > received, "Received");
+
+    uint256 scores;
+    for (uint256 i = received + 1; i <= times; i++) {
+      scores += GamesRewardsScores.get(2, i);
+    }
+    RankingRecord.setTotalScore(player, RankingRecord.getTotalScore(player) + scores);
+    (uint256 csd, uint256 currentSeason) = Utils.getCurrentSeason();
+    if(csd > 0 && currentSeason > 0){
+        WeeklyRecord.setTotalScore(player, currentSeason, csd, WeeklyRecord.getTotalScore(player, currentSeason, csd) + scores);
+    }
+    StreakDays.setReceived(player, times);
+  }
+
+  // function getStreakDaysTotalRewards() public {
+  //   address player = _msgSender();
+  //   StreakDaysData memory streakDaysData = StreakDays.get(player);
+
+  //   uint256 times = streakDaysData.totalTimes;
+  //   uint256 received = streakDaysData.totalReceived;
+
+  //   require(times > received, "Received");
+
+  //   uint256 scores;
+  //   for (uint256 i = received + 1; i <= times; i++) {
+  //     scores += GamesRewardsScores.get(3, i);
+  //   }
+  //   RankingRecord.setTotalScore(player, RankingRecord.getTotalScore(player) + scores);
+  //   (uint256 csd, uint256 currentSeason) = Utils.getCurrentSeason();
+  //   if(csd > 0 && currentSeason > 0){
+  //       WeeklyRecord.setTotalScore(player, currentSeason, csd, WeeklyRecord.getTotalScore(player, currentSeason, csd) + scores);
+  //   }
+  //   StreakDays.setTotalReceived(player, times);
+  // }
 }

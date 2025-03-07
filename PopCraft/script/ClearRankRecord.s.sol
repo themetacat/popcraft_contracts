@@ -5,7 +5,7 @@ import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 // Create resource identifiers (for the namespace and system)
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
-import { GameRecord, RankingRecord, SeasonTime, StarToScore } from "../src/codegen/index.sol";
+import { GameRecord, RankingRecord, SeasonTime, StarToScore,GamesRewardsScores, StreakDays,ComboReward } from "../src/codegen/index.sol";
 // forge script script/ClearRankRecord.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
 
 contract PopCraftExtension is Script {
@@ -16,7 +16,9 @@ contract PopCraftExtension is Script {
  
     vm.startBroadcast(deployerPrivateKey);
     StoreSwitch.setStoreAddress(worldAddress);
-    StarToScore.set(101, 150);
+    // StreakDays.register();
+    // ComboReward.register();
+    // StarToScore.set(101, 150);
     // SeasonTime.set(1, 1740038400, 1200);
     // address[1] memory userAddress = [
     //   0x38BbD375d49d6237984cbfa19719c419af9FE514
@@ -39,6 +41,19 @@ contract PopCraftExtension is Script {
     //   // GameRecord.deleteRecord(userAddress[i]);
     //   // RankingRecord.deleteRecord(userAddress[i]);
     // }
+    // GamesRewardsScores.set(1, 3, 150);
+    // GamesRewardsScores.set(1, 5, 350);
+    // GamesRewardsScores.set(1, 10, 1000);
+    // GamesRewardsScores.set(1, 20, 3000);
+    // GamesRewardsScores.set(1, 50, 10000);
+
+    // GamesRewardsScores.set(1, 1, 0);
+    // GamesRewardsScores.set(1, 3, 250);
+    // GamesRewardsScores.set(1, 5, 500);
+    // GamesRewardsScores.set(1, 10, 800);
+    // GamesRewardsScores.set(1, 20, 2000);
+
+    
 
     vm.stopBroadcast();
   }
