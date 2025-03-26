@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.21;
 
-import { RankingRecord, PlantsLevel, PlantsLevelData, PlayerPlantingRecord, Token, PriTokenPrice, ComboRewardGames, ComboRewardGamesData, SeasonTime, SeasonTimeData } from "../codegen/index.sol";
+import { RankingRecord, PlantsLevel, PlantsLevelData, PlayerPlantingRecord, Token, PriTokenPrice, ComboRewardGames, ComboRewardGamesData, SeasonTime, SeasonTimeData, NFTToTokenDiscount } from "../codegen/index.sol";
 import { UniversalRouterParams } from "../core_codegen/index.sol";
 import { Utils } from "./Utils.sol";
+import { IERC721 } from "../interfaces/IERC721.sol";
+
 
 library Check {
   function checkScoreSufficiency(
@@ -88,10 +90,10 @@ library Check {
       valuePri += priResultParams[p].value;
     }
 
-    return (resultParams, value, priResultParams, valuePri);
+    return (resultParams, value, finalPriResultParams, valuePri);
   }
 
-  function checkPriTokenPirce(UniversalRouterParams[] memory priResultParams, uint256 value) internal view {
+  function checkPriTokenPirce(UniversalRouterParams[] memory priResultParams, uint256 value, address player) internal view {
     uint256 pararmLength = priResultParams.length;
     uint256 totalPrice;
     for (uint256 i; i < pararmLength; i++) {
@@ -99,7 +101,16 @@ library Check {
         (PriTokenPrice.get(priResultParams[i].token_info.token_addr) * priResultParams[i].token_info.amount) /
         1e18;
     }
-    require(totalPrice == value, "Insufficient payment amount");
+    uint256 NFTBalance = IERC721(0xf6e9932469CBde5dB4b9293330Ff1897Bb43b2AE).balanceOf(player);
+    uint256 discount = 0;
+    if(NFTBalance > 0){
+      if(NFTBalance > NFTToTokenDiscount.get(0)){
+        discount = NFTToTokenDiscount.get(NFTToTokenDiscount.get(0));
+      }else{
+        discount = NFTToTokenDiscount.get(NFTBalance);
+      }
+    }
+    require((totalPrice * (100 - discount)) / 100 == value, "Insufficient payment amount");
   }
 
   function checkIsPriToken(address tokenAddr) internal view returns (bool) {

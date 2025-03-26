@@ -2,38 +2,19 @@
 pragma solidity >=0.8.21;
 
 import { System } from "@latticexyz/world/src/System.sol";
-// import { ICoreSystem } from "../core_codegen/world/ICoreSystem.sol";
-// import { IWorld } from "../core_codegen/world/IWorld.sol";
 import { DefaultParameters, Position, ERC20TokenBalance, UniversalRouterParams } from "../core_codegen/index.sol";
-// import "@openzeppelin/contracts/utils/Strings.sol";
-import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward, WeeklyRecord, WeeklyRecordData, ScoreToPointsRewards, DailyGames, DailyGamesData, StreakDays, StreakDaysData, ComboRewardGames, ComboRewardGamesData } from "../codegen/index.sol";
+import { TCMPopStar, TCMPopStarData, TokenBalance, TokenSold, TokenSoldData, GameRecord, GameRecordData, RankingRecord, Token, OverTime, UserBenefitsToken, ComboReward, WeeklyRecord, WeeklyRecordData, ScoreToPointsRewards, DailyGames, DailyGamesData, StreakDays, StreakDaysData, ComboRewardGames, ComboRewardGamesData, NFTToTokenDiscount } from "../codegen/index.sol";
 import { IERC20 } from "@latticexyz/world-modules/src/modules/erc20-puppet/IERC20.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
-// import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.sol";
-// import { Puppet } from "@latticexyz/world-modules/src/modules/puppet/Puppet.sol";
-// import { WorldContextConsumerLib } from "@latticexyz/world/src/WorldContext.sol";
-// import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
-// import { IQuote, SwapParams, Quote } from "../interfaces/IQuote.sol";
-// import { AccessControl } from "@latticexyz/world/src/AccessControl.sol";
+import { IERC721 } from "../interfaces/IERC721.sol";
 import { Check } from "../libraries/Check.sol";
 import { Utils } from "../libraries/Utils.sol";
 import { PopCraftUtils } from "../libraries/PopCraftUtils.sol";
 
 contract PopCraftSystem is System {
-  // string constant APP_ICON = "U+1F48E";
-  // string constant NAMESPACE = "popCraft";
-  // string constant SYSTEM_NAME = "PopCraftSystem";
-  // string constant APP_NAME = "PopCraft";
-  // string constant APP_MANIFEST = "BASE/PopCraftSystem";
-  // bytes14 constant BYTESNAMESPACE = bytes14(bytes(NAMESPACE));
-
   error InsufficientBalance(address);
 
   receive() external payable {}
-
-  // function init() public {
-  //   ICoreSystem(_world()).update_app(APP_NAME, APP_ICON, APP_MANIFEST, NAMESPACE, SYSTEM_NAME);
-  // }
 
   function interact(DefaultParameters memory default_parameters) public {
     Position memory position = default_parameters.position;
@@ -66,19 +47,6 @@ contract PopCraftSystem is System {
       updateComboRewardGames();
     }
   }
-
-  // function shuffle() private view returns (uint256[] memory) {
-  //   uint256[] memory matrix = new uint256[](100);
-  //   address sender = _msgSender();
-  //   for (uint256 i = 0; i < 100; ) {
-  //     uint256 random_num = (uint256(keccak256(abi.encodePacked(sender, block.timestamp, block.number, i))) % 5) + 1;
-  //     matrix[i] = random_num;
-  //     unchecked {
-  //       i++;
-  //     }
-  //   }
-  //   return matrix;
-  // }
 
   function pop(DefaultParameters memory default_parameters) public {
     Position memory position = default_parameters.position;
@@ -191,54 +159,6 @@ contract PopCraftSystem is System {
     TokenBalance.set(sender, token_addr, token_balance - deduct_token_num);
   }
 
-  // function dfs(
-  //   uint256 matrix_index,
-  //   uint256 target_value,
-  //   uint256[] memory matrix_array,
-  //   uint256 eliminate_amount
-  // ) private returns (uint256[] memory, uint256) {
-  //   uint256 x = matrix_index % 10;
-  //   uint256 y = matrix_index / 10;
-
-  //   uint256 index;
-  //   if (x > 0) {
-  //     index = matrix_index - 1;
-  //     if (matrix_array[index] == target_value) {
-  //       matrix_array[index] = 0;
-  //       eliminate_amount += 1;
-  //       (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
-  //     }
-  //   }
-
-  //   if (x < 9) {
-  //     index = matrix_index + 1;
-  //     if (matrix_array[index] == target_value) {
-  //       matrix_array[index] = 0;
-  //       eliminate_amount += 1;
-  //       (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
-  //     }
-  //   }
-
-  //   if (y > 0) {
-  //     index = matrix_index - 10;
-  //     if (matrix_array[index] == target_value) {
-  //       matrix_array[index] = 0;
-  //       eliminate_amount += 1;
-  //       (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
-  //     }
-  //   }
-
-  //   if (y < 9) {
-  //     index = matrix_index + 10;
-  //     if (matrix_array[index] == target_value) {
-  //       matrix_array[index] = 0;
-  //       eliminate_amount += 1;
-  //       (matrix_array, eliminate_amount) = dfs(index, target_value, matrix_array, eliminate_amount);
-  //     }
-  //   }
-
-  //   return (matrix_array, eliminate_amount);
-  // }
 
   function comboReward(uint256 eliminateAmount, address tokenAddr) private {
     address sender = _msgSender();
@@ -304,60 +224,8 @@ contract PopCraftSystem is System {
     return matrix_array;
   }
 
-  // function check_pop_access(
-  //   uint256 matrix_index,
-  //   uint256 target_value,
-  //   uint256[] memory matrix_array
-  // ) private pure returns (bool) {
-  //   uint256 x = matrix_index % 10;
-  //   uint256 y = matrix_index / 10;
-
-  //   uint256 index;
-  //   if (x > 0) {
-  //     index = matrix_index - 1;
-  //     if (matrix_array[index] == target_value) {
-  //       return true;
-  //     }
-  //   }
-
-  //   if (x < 9) {
-  //     index = matrix_index + 1;
-  //     if (matrix_array[index] == target_value) {
-  //       return true;
-  //     }
-  //   }
-
-  //   if (y > 0) {
-  //     index = matrix_index - 10;
-  //     if (matrix_array[index] == target_value) {
-  //       return true;
-  //     }
-  //   }
-
-  //   if (y < 9) {
-  //     index = matrix_index + 10;
-  //     if (matrix_array[index] == target_value) {
-  //       return true;
-  //     }
-  //   }
-
-  //   return false;
-  // }
-
-  // function check_game_finished(uint256[] memory matrix_array) private pure returns (bool) {
-  //   unchecked {
-  //     for (uint256 i; i < 99; ) {
-  //       if (matrix_array[i] != 0) {
-  //         return false;
-  //       }
-  //       i++;
-  //     }
-  //   }
-  //   return true;
-  // }
-
   function buyToken(UniversalRouterParams[] calldata universalRouterParams) public payable {
-    uint256 router_params_length = universalRouterParams.length;
+    // uint256 router_params_length = universalRouterParams.length;
 
     require(_msgValue() > 0, "msgValue < 0");
     (
@@ -366,14 +234,14 @@ contract PopCraftSystem is System {
       UniversalRouterParams[] memory priResultParams,
       uint256 valuePri
     ) = Check.dealUniversalRouterParams(universalRouterParams);
-    require(_msgValue() >= value + valuePri, "Insufficient");
-    Check.checkPriTokenPirce(priResultParams, valuePri);
-
     require(resultParams.length == 0, "token > 0");
+    // add erc20 token: change here !!!
+    // require(_msgValue() >= value + valuePri, "Insufficient");
+    Check.checkPriTokenPirce(priResultParams, _msgValue(), _msgSender());
 
-    for (uint256 i; i < router_params_length; i++) {
-      address token_addr = universalRouterParams[i].token_info.token_addr;
-      uint256 amount = universalRouterParams[i].token_info.amount;
+    for (uint256 i; i < priResultParams.length; i++) {
+      address token_addr = priResultParams[i].token_info.token_addr;
+      uint256 amount = priResultParams[i].token_info.amount;
 
       TokenSoldData memory tokenSoldData = TokenSold.get(token_addr);
       TokenSold.set(token_addr, tokenSoldData.soldNow + amount, tokenSoldData.soldAll + amount);

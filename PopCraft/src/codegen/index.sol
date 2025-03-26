@@ -25,6 +25,7 @@ import { ScoreToPoints, ScoreToPointsTableId } from "./tables/ScoreToPoints.sol"
 import { DailyGames, DailyGamesData, DailyGamesTableId } from "./tables/DailyGames.sol";
 import { StreakDays, StreakDaysData, StreakDaysTableId } from "./tables/StreakDays.sol";
 import { GamesRewardsScores, GamesRewardsScoresTableId } from "./tables/GamesRewardsScores.sol";
+import { NFTToTokenDiscount, NFTToTokenDiscountTableId } from "./tables/NFTToTokenDiscount.sol";
 import { Plants, PlantsData, PlantsTableId } from "./tables/Plants.sol";
 import { TotalPlants, TotalPlantsTableId } from "./tables/TotalPlants.sol";
 import { PlantsLevel, PlantsLevelData, PlantsLevelTableId } from "./tables/PlantsLevel.sol";

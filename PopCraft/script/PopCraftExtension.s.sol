@@ -15,7 +15,7 @@ import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
 import { IStore } from "@latticexyz/store/src/IStore.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 import { DefaultParameters } from "../src/core_codegen/index.sol";
-import { TCMPopStar, GameRecord, TokenSold, TokenBalance, StarToScore, DayToScore, RankingRecord, Token, OverTime, PriTokenPrice, UserBenefitsToken, ComboReward, SeasonTime, CurrentSeasonDimension, WeeklyRecord, ScoreToPoints, ScoreToPointsRewards, ComboRewardGames } from "../src/codegen/index.sol";
+import { TCMPopStar, GameRecord, TokenSold, TokenBalance, StarToScore, DayToScore, RankingRecord, Token, OverTime, PriTokenPrice, UserBenefitsToken, ComboReward, SeasonTime, CurrentSeasonDimension, WeeklyRecord, ScoreToPoints, ScoreToPointsRewards, ComboRewardGames, NFTToTokenDiscount } from "../src/codegen/index.sol";
 // import { TokenSold } from "../src/codegen/index.sol";
 // import { TokenBalance } from "../src/codegen/index.sol";
 import { PopCraftSystem } from "../src/systems/PopCraftSystem.sol";
@@ -55,6 +55,13 @@ contract PopCraftExtension is Script {
     WeeklyRecord.register();
     ScoreToPoints.register();
     ComboRewardGames.register();
+    NFTToTokenDiscount.register();
+
+    NFTToTokenDiscount.set(0, 4);
+    NFTToTokenDiscount.set(1, 10);
+    NFTToTokenDiscount.set(2, 20);
+    NFTToTokenDiscount.set(3, 30);
+    NFTToTokenDiscount.set(4, 40);
 
     ScoreToPoints.set(250, 50);
     SeasonTime.set(1, 1740060000, 604800); // week weeklyRecord
