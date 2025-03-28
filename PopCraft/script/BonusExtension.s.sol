@@ -8,7 +8,7 @@ import { WorldRegistrationSystem } from "@latticexyz/world/src/modules/core/impl
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
 import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
-import { UserBenefitsToken } from "../src/codegen/index.sol";
+import { UserBenefitsToken, NFTRewards } from "../src/codegen/index.sol";
 import { BonusSystem } from "../src/systems/BonusSystem.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 
@@ -28,6 +28,17 @@ contract BonusExtension is Script {
 
     StoreSwitch.setStoreAddress(worldAddress);
     UserBenefitsToken.register();
+    NFTRewards.register();
+    // 2 3 7 27 37 38 39 40  54
+    NFTRewards.set(2, true, 0xb80AF1d22D36A9B03C7725bdd74cabAE8cbB220b);
+    NFTRewards.set(3, true, 0x99FD88012229473B13011c821B24Ebf8AabF82c4);
+    NFTRewards.set(7, true, 0x392796f95B2398Aa98D55e3dF5967D20F5A97F18);
+    NFTRewards.set(27, true, 0xD3d0406AE6c6bE123bE80580cD9FbD4d96033DBB);
+    NFTRewards.set(37, true, 0xD3d0406AE6c6bE123bE80580cD9FbD4d96033DBB);
+    NFTRewards.set(38, true, 0xD3d0406AE6c6bE123bE80580cD9FbD4d96033DBB);
+    NFTRewards.set(39, true, 0xD3d0406AE6c6bE123bE80580cD9FbD4d96033DBB);
+    NFTRewards.set(40, true, 0xD3d0406AE6c6bE123bE80580cD9FbD4d96033DBB);
+    NFTRewards.set(54, true, 0xDa68a8f7dAdaEd387be410BBD172E8Af4ee383A7);
 
     BonusSystem bonusSystem = new BonusSystem();
     console.log("SYSTEM_ADDRESS: ", address(bonusSystem));

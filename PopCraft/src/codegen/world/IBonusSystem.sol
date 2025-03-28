@@ -9,4 +9,6 @@ pragma solidity >=0.8.21;
  */
 interface IBonusSystem {
   function popCraft_BonusSystem_getUserBenefitsToken() external;
+
+  function popCraft_BonusSystem_getNFTRewardsToken() external;
 }
