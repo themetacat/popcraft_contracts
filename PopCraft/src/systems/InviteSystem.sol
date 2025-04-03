@@ -42,8 +42,7 @@ contract InviteSystem is System {
       newInvitees[index] = invitees[index];
     }
     newInvitees[invitees.length] = player;
-
-    InviterV2.setPlayer(inviter, newInvitees);
+    InviterV2.set(inviter, 1, InviterV2.getCode(inviter), newInvitees);
     PlayerToInviteV2.set(player, 1, code);
   }
 }
