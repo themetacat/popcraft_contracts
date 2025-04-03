@@ -5,8 +5,7 @@ import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 // Create resource identifiers (for the namespace and system)
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
-import { GameRecord, RankingRecord, SeasonTime, StarToScore, GamesRewardsScores, StreakDays, ComboReward, TokenBalance, TokenSoldData, TokenSold } from "../src/codegen/index.sol";
-// forge script script/ClearRankRecord.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
+import { GameRecord, RankingRecord, SeasonTime, StarToScore, GamesRewardsScores, StreakDays, ComboReward, TokenBalance, TokenSoldData, TokenSold, NFTRewards } from "../src/codegen/index.sol";
 
 contract PopCraftExtension is Script {
   function run() external {
@@ -21,14 +20,9 @@ contract PopCraftExtension is Script {
     // StarToScore.set(101, 150);
     // SeasonTime.set(1, 1740038400, 1200);
 
-    // forge script script/ClearRankRecord.s.sol --rpc-url https://rpc.morphl2.io --broadcast
     // SeasonTime.set(1, 1740142800, 604800); //1740142800
     // SeasonTime.set(2, 1740747600, 86400); //1740747600
     // SeasonTime.set(3, 1741352400, 604800); //1741352400
-
-    SeasonTime.set(1, 0, 0); //1740142800
-    SeasonTime.set(2, 0, 0); //1740747600
-    SeasonTime.set(3, 0, 0); //1741352400
 
     //  1	1740060000	604800
     // 2	1740664800	86400
@@ -36,36 +30,41 @@ contract PopCraftExtension is Script {
     // 4	0	86400
     // 5	1741269600	86400
 
-    // address[10] memory priTokenAddress = [
-    //   0x0000000000000000000000000000000000000003,
-    //   0x0000000000000000000000000000000000000004,
-    //   0x0000000000000000000000000000000000000005,
-    //   0x0000000000000000000000000000000000000006,
-    //   0x0000000000000000000000000000000000000007,
-    //   0x0000000000000000000000000000000000000008,
-    //   0x0000000000000000000000000000000000000009,
-    //   0x0000000000000000000000000000000000000010,
-    //   0x0000000000000000000000000000000000000011,
-    //   0x0000000000000000000000000000000000000012
-    // ];
-    // uint256 rewardTokenAmount = 75 * 10 ** 18;
-    // address[1] memory rewardAddress = [
-    //   // 0x99FD88012229473B13011c821B24Ebf8AabF82c4,
-    //   // 0x392796f95B2398Aa98D55e3dF5967D20F5A97F18,
-    //   // 0xb80AF1d22D36A9B03C7725bdd74cabAE8cbB220b,
-    //   // 0xDa68a8f7dAdaEd387be410BBD172E8Af4ee383A7
-    //   0xD3d0406AE6c6bE123bE80580cD9FbD4d96033DBB
-
-    // ];
-    // for (uint256 i = 0; i < rewardAddress.length; i++) {
-    //   address player = rewardAddress[i];
-    //   for (uint256 j = 0; j < priTokenAddress.length; j++) {
-    //     address tokenAddr = priTokenAddress[j];
-    //     TokenBalance.set(player, tokenAddr, TokenBalance.get(rewardAddress[i], tokenAddr) + rewardTokenAmount);
-    //     TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
-    //     TokenSold.set(tokenAddr, tokenSoldData.soldNow + rewardTokenAmount, tokenSoldData.soldAll + rewardTokenAmount);
-    //   }
-    // }
+    address[10] memory priTokenAddress = [
+      0x0000000000000000000000000000000000000003,
+      0x0000000000000000000000000000000000000004,
+      0x0000000000000000000000000000000000000005,
+      0x0000000000000000000000000000000000000006,
+      0x0000000000000000000000000000000000000007,
+      0x0000000000000000000000000000000000000008,
+      0x0000000000000000000000000000000000000009,
+      0x0000000000000000000000000000000000000010,
+      0x0000000000000000000000000000000000000011,
+      0x0000000000000000000000000000000000000012
+    ];
+    uint256 rewardTokenAmount = 20 * 10 ** 18;
+    address[1] memory rewardAddress = [
+      // 0x99FD88012229473B13011c821B24Ebf8AabF82c4,
+      // 0x392796f95B2398Aa98D55e3dF5967D20F5A97F18,
+      // 0xb80AF1d22D36A9B03C7725bdd74cabAE8cbB220b,
+      // 0xDa68a8f7dAdaEd387be410BBD172E8Af4ee383A7
+      // 0xD3d0406AE6c6bE123bE80580cD9FbD4d96033DBB
+      // 0x90e956AD3081d6125075Eb1763Ce544fBedDd00F,
+      // 0xFa1B50c44e03E7F9aA9bB61B17CD69100e562230,
+      // 0x08cA42b0dB1471b5b7252dEE9edd10E4Cb5AFD87,
+      // 0xDd7D37520463F7CE7790CBfE0cf3F62BfE218407,
+      // 0x70fc8bad2dE5FabC939C1294bc15CE275B70C618
+      0xbF0826043F143478c923E0cAe01A8796017EAaD3
+    ];
+    for (uint256 i = 0; i < rewardAddress.length; i++) {
+      address player = rewardAddress[i];
+      for (uint256 j = 0; j < priTokenAddress.length; j++) {
+        address tokenAddr = priTokenAddress[j];
+        TokenBalance.set(player, tokenAddr, TokenBalance.get(rewardAddress[i], tokenAddr) + rewardTokenAmount);
+        TokenSoldData memory tokenSoldData = TokenSold.get(tokenAddr);
+        TokenSold.set(tokenAddr, tokenSoldData.soldNow + rewardTokenAmount, tokenSoldData.soldAll + rewardTokenAmount);
+      }
+    }
 
     // GamesRewardsScores.set(1, 3, 150);
     // GamesRewardsScores.set(1, 5, 350);

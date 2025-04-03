@@ -64,7 +64,8 @@ contract PopCraftExtension is Script {
     NFTToTokenDiscount.set(4, 40);
 
     ScoreToPoints.set(250, 50);
-    SeasonTime.set(1, 1740060000, 604800); // week weeklyRecord
+    SeasonTime.set(1, 1740142800, 604800); //1740142800
+    // SeasonTime.set(1, 1740060000, 604800); // week weeklyRecord
     CurrentSeasonDimension.set(0, 1); // current: week
 
     // comboReward startTime 
@@ -166,7 +167,7 @@ contract PopCraftExtension is Script {
     
     world.registerSystem(systemResource, popCraftSystem, true);
     world.registerFunctionSelector(systemResource, "init()");
-    world.registerFunctionSelector(systemResource, "buyToken((bytes,uint256,(address,uint256))[])");
+    // world.registerFunctionSelector(systemResource, "buyToken((bytes,uint256,(address,uint256))[])");
 
     // world.registerFunctionSelector(systemResource, "interact((address,string,(uint32,uint32),string))");
     // world.registerFunctionSelector(systemResource, "pop((address,string,(uint32,uint32),string))");

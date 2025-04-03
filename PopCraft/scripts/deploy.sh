@@ -61,6 +61,8 @@ forge script script/${EXETENSION_FILE}.s.sol --rpc-url $RPC_URL --broadcast
 forge script script/MissionExtension.s.sol --rpc-url $RPC_URL --broadcast
 forge script script/PlantsExtension.s.sol --rpc-url $RPC_URL --broadcast
 forge script script/BonusExtension.s.sol --rpc-url $RPC_URL --broadcast
+forge script script/InviteExtension.s.sol --rpc-url $RPC_URL --broadcast
+forge script script/BuyExtension.s.sol --rpc-url $RPC_URL --broadcast
 sleep 1
 
 PRIVATE_KEY=$(grep -E "^PRIVATE_KEY=" .env | cut -d '=' -f2-)

@@ -2,6 +2,7 @@
 pragma solidity >=0.8.21;
 
 import { WeeklyRecord, CurrentSeasonDimension, SeasonTime, SeasonTimeData, RankingRecord, StarToScore, WeeklyRecordData, TCMPopStar, ScoreToPointsRewards, GameRecord, RankingRecordData, ScoreToPoints, DailyGames } from "../codegen/index.sol";
+import { Invite } from "./Invite.sol";
 
 library Utils {
   function getCurrentSeason() public view returns (uint256, uint256) {
@@ -27,11 +28,6 @@ library Utils {
     uint256 lastestScores = rankingRecordData.latestScores + score;
     uint256 totalScore = rankingRecordData.totalScore + score;
     uint256 highestScore = rankingRecordData.highestScore;
-
-    // uint256 shortestTime = RankingRecord.getShortestTime(owner);
-    // uint256 lastestScores = RankingRecord.getLatestScores(owner) + score;
-    // uint256 totalScore = RankingRecord.getTotalScore(owner) + score;
-    // uint256 highestScore = RankingRecord.getHighestScore(owner);
 
     (uint256 csd, uint256 currentSeason) = getCurrentSeason();
     WeeklyRecordData memory weeklyRecordData = WeeklyRecord.get(owner, currentSeason, csd);
@@ -89,6 +85,7 @@ library Utils {
         weeklyRecordData.totalPoints
       );
     }
+    Invite.addInviteScores(totalScore-(rankingRecordData.totalScore), owner, csd, currentSeason);
   }
 
   function getCurrentDayFromDailyGames() public view returns (uint256) {

@@ -27,6 +27,10 @@ import { StreakDays, StreakDaysData, StreakDaysTableId } from "./tables/StreakDa
 import { GamesRewardsScores, GamesRewardsScoresTableId } from "./tables/GamesRewardsScores.sol";
 import { NFTToTokenDiscount, NFTToTokenDiscountTableId } from "./tables/NFTToTokenDiscount.sol";
 import { NFTRewards, NFTRewardsData, NFTRewardsTableId } from "./tables/NFTRewards.sol";
+import { InviterV2, InviterV2Data, InviterV2TableId } from "./tables/InviterV2.sol";
+import { InviteCodeToInviter, InviteCodeToInviterTableId } from "./tables/InviteCodeToInviter.sol";
+import { PlayerToInviteV2, PlayerToInviteV2Data, PlayerToInviteV2TableId } from "./tables/PlayerToInviteV2.sol";
+import { InvitationScoreRecord, InvitationScoreRecordData, InvitationScoreRecordTableId } from "./tables/InvitationScoreRecord.sol";
 import { Plants, PlantsData, PlantsTableId } from "./tables/Plants.sol";
 import { TotalPlants, TotalPlantsTableId } from "./tables/TotalPlants.sol";
 import { PlantsLevel, PlantsLevelData, PlantsLevelTableId } from "./tables/PlantsLevel.sol";

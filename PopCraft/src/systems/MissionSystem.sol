@@ -5,6 +5,7 @@ import { System } from "@latticexyz/world/src/System.sol";
 import { DailyGames, DailyGamesData, GamesRewardsScores, WeeklyRecord, RankingRecord, StreakDays, StreakDaysData } from "../codegen/index.sol";
 import { Check } from "../libraries/Check.sol";
 import { Utils } from "../libraries/Utils.sol";
+import { Invite } from "../libraries/Invite.sol";
 
 contract MissionSystem is System {
   function getDailyGamesRewards() public {
@@ -32,6 +33,7 @@ contract MissionSystem is System {
         WeeklyRecord.setTotalScore(player, currentSeason, csd, WeeklyRecord.getTotalScore(player, currentSeason, csd) + scores);
     }
     DailyGames.setReceived(player, games);
+    Invite.addInviteScores(scores, player, csd, currentSeason);
   }
 
   function getStreakDaysRewards() public {
@@ -59,6 +61,7 @@ contract MissionSystem is System {
         WeeklyRecord.setTotalScore(player, currentSeason, csd, WeeklyRecord.getTotalScore(player, currentSeason, csd) + scores);
     }
     StreakDays.setReceived(player, times);
+    Invite.addInviteScores(scores, player, csd, currentSeason);
   }
 
   // function getStreakDaysTotalRewards() public {

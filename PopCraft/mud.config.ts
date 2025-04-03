@@ -236,6 +236,43 @@ export default mudConfig({
         receiver: "address"
       }
     },
+    // --------------- Invite ---------------
+    InviterV2: {
+      keySchema: {
+        inviter: "address",
+      },
+      valueSchema: {
+        value: "uint256",
+        code: "string",
+        player: "address[]",
+      }
+    },
+    InviteCodeToInviter: {
+      keySchema: {
+        code: "bytes32",
+      },
+      valueSchema: {
+        inviter: "address"
+      }
+    },
+    PlayerToInviteV2: {
+      keySchema: {
+        player: "address",
+      },
+      valueSchema: {
+        value: "uint256",
+        code: "string"
+      }
+    },
+    InvitationScoreRecord: {
+      keySchema: {
+        player: "address",
+      },
+      valueSchema: {
+        remainingScores: "uint256",
+        totalScores: "uint256"
+      }
+    },
     //    ------------- Plants ---------------
     // add Plants, update TotalPlants
     Plants: {

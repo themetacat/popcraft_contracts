@@ -33,17 +33,19 @@ contract PlantsExtension is Script {
     StreakDays.register();
 
     // in-day bonus
-    SeasonTime.set(2, 1740664800, 86400);
+    SeasonTime.set(2, 1740747600, 86400); //1740747600
+    // SeasonTime.set(2, 1740664800, 86400);
 
     // in-day bonus
-    GamesRewardsScores.set(1, 1, 50);
-    GamesRewardsScores.set(1, 3, 250);
-    GamesRewardsScores.set(1, 5, 500);
-    GamesRewardsScores.set(1, 10, 800);
-    GamesRewardsScores.set(1, 20, 2000);
+    GamesRewardsScores.set(1, 3, 150);
+    GamesRewardsScores.set(1, 5, 350);
+    GamesRewardsScores.set(1, 10, 1000);
+    GamesRewardsScores.set(1, 20, 3000);
+    GamesRewardsScores.set(1, 50, 10000);
 
     // streak day
-    SeasonTime.set(3, 1741269600, 604800);
+    SeasonTime.set(3, 1741352400, 604800); //1741352400
+    // SeasonTime.set(3, 1741269600, 604800);
 
     // day
     SeasonTime.set(4, 0, 86400);
