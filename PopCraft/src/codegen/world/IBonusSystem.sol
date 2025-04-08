@@ -11,4 +11,6 @@ interface IBonusSystem {
   function popCraft_BonusSystem_getUserBenefitsToken() external;
 
   function popCraft_BonusSystem_getNFTRewardsToken() external;
+
+  function popCraft_BonusSystem_getMorphBlackRewardsToken() external;
 }

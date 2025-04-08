@@ -8,7 +8,7 @@ import { WorldRegistrationSystem } from "@latticexyz/world/src/modules/core/impl
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
 import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
-import { UserBenefitsToken, NFTRewards } from "../src/codegen/index.sol";
+import { UserBenefitsToken, NFTRewards, MorphBlack, MorphBlackRewards } from "../src/codegen/index.sol";
 import { BonusSystem } from "../src/systems/BonusSystem.sol";
 import { StoreSwitch } from "@latticexyz/store/src/StoreSwitch.sol";
 
@@ -29,6 +29,8 @@ contract BonusExtension is Script {
     StoreSwitch.setStoreAddress(worldAddress);
     UserBenefitsToken.register();
     NFTRewards.register();
+    MorphBlack.register();
+    MorphBlackRewards.register();
     // 2 3 7 27 37 38 39 40  54
     NFTRewards.set(2, true, 0xb80AF1d22D36A9B03C7725bdd74cabAE8cbB220b);
     NFTRewards.set(3, true, 0x99FD88012229473B13011c821B24Ebf8AabF82c4);

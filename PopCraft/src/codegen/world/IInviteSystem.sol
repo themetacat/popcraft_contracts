@@ -10,5 +10,5 @@ pragma solidity >=0.8.21;
 interface IInviteSystem {
   function popCraft_InviteSystem_genInviteCode() external;
 
-  function popCraft_InviteSystem_acceptInvitation(bytes8 code) external;
+  function popCraft_InviteSystem_acceptInvitation(string memory code) external;
 }
