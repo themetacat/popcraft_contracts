@@ -20,6 +20,9 @@ contract ExchangeSystem is System {
       needGp += 300 * (exchangeGpTokenData[index].amount);
     }
 
+    uint256 consumeValue = GPConsumeValue.getValue(player);
+    require(totalPoints - consumeValue >= needGp, "Insufficient GP");
+    
     for (uint256 index = 0; index < exchangeGpTokenData.length; index++) {
       address token = exchangeGpTokenData[index].token;
       uint256 exchangeAmount = exchangeGpTokenData[index].amount * 1e18;
@@ -28,9 +31,6 @@ contract ExchangeSystem is System {
       TokenSoldData memory tokenSoldData = TokenSold.get(token);
       TokenSold.set(token, tokenSoldData.soldNow + exchangeAmount, tokenSoldData.soldAll + exchangeAmount);
     }
-
-    uint256 consumeValue = GPConsumeValue.getValue(player);
-    require(totalPoints - consumeValue >= needGp, "Insufficient GP");
     GPConsumeValue.setValue(player, consumeValue + needGp);
   }
 
