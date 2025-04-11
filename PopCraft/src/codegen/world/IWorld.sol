@@ -7,6 +7,7 @@ import { IBaseWorld } from "@latticexyz/world/src/codegen/interfaces/IBaseWorld.
 
 import { IBonusSystem } from "./IBonusSystem.sol";
 import { IBuySystem } from "./IBuySystem.sol";
+import { IExchangeSystem } from "./IExchangeSystem.sol";
 import { IInviteSystem } from "./IInviteSystem.sol";
 import { IMissionSystem } from "./IMissionSystem.sol";
 import { IPlantsSystem } from "./IPlantsSystem.sol";
@@ -22,6 +23,7 @@ interface IWorld is
   IBaseWorld,
   IBonusSystem,
   IBuySystem,
+  IExchangeSystem,
   IInviteSystem,
   IMissionSystem,
   IPlantsSystem,

@@ -237,7 +237,7 @@ export default mudConfig({
       }
     },
     // --------------- Morph Black NFT Token Rewards ----------
-    MorphBlack:{
+    MorphBlack: {
       keySchema: {
         player: "address",
       },
@@ -342,6 +342,24 @@ export default mudConfig({
         level: "uint256",
         growTime: "uint256",
         changeTimes: "uint256"
+      }
+    },
+    PlantsToGP: {
+      keySchema: {
+        plantsId: "uint256",
+      },
+      valueSchema: {
+        points: "uint256",
+      }
+    },
+    // ------------- Exchange ---------------
+    // ------------- GP - Token ---------------
+    GPConsumeValue: {
+      keySchema: {
+        player: "address",
+      },
+      valueSchema: {
+        value: "uint256"
       }
     }
   },

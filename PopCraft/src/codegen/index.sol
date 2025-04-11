@@ -38,3 +38,5 @@ import { TotalPlants, TotalPlantsTableId } from "./tables/TotalPlants.sol";
 import { PlantsLevel, PlantsLevelData, PlantsLevelTableId } from "./tables/PlantsLevel.sol";
 import { PlayerPlantingRecord, PlayerPlantingRecordData, PlayerPlantingRecordTableId } from "./tables/PlayerPlantingRecord.sol";
 import { CurrentPlayerPlants, CurrentPlayerPlantsData, CurrentPlayerPlantsTableId } from "./tables/CurrentPlayerPlants.sol";
+import { PlantsToGP, PlantsToGPTableId } from "./tables/PlantsToGP.sol";
+import { GPConsumeValue, GPConsumeValueTableId } from "./tables/GPConsumeValue.sol";

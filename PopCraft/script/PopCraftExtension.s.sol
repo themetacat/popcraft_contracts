@@ -82,7 +82,7 @@ contract PopCraftExtension is Script {
     StarToScore.set(4, 16);
     StarToScore.set(5, 25);
     // game success
-    StarToScore.set(101, 150);
+    StarToScore.set(101, 300);
 
     // Additional rewards for logging in for 7 consecutive days
     DayToScore.set(0, 500);
