@@ -9,7 +9,9 @@ import { IBonusSystem } from "./IBonusSystem.sol";
 import { IBuySystem } from "./IBuySystem.sol";
 import { IExchangeSystem } from "./IExchangeSystem.sol";
 import { IInviteSystem } from "./IInviteSystem.sol";
+import { IMClearBoardSystem } from "./IMClearBoardSystem.sol";
 import { IMissionSystem } from "./IMissionSystem.sol";
+import { IMScoreChallengeSystem } from "./IMScoreChallengeSystem.sol";
 import { IPlantsSystem } from "./IPlantsSystem.sol";
 import { IPopCraftSystem } from "./IPopCraftSystem.sol";
 
@@ -25,7 +27,9 @@ interface IWorld is
   IBuySystem,
   IExchangeSystem,
   IInviteSystem,
+  IMClearBoardSystem,
   IMissionSystem,
+  IMScoreChallengeSystem,
   IPlantsSystem,
   IPopCraftSystem
 {

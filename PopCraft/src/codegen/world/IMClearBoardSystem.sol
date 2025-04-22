@@ -6,9 +6,11 @@ pragma solidity >=0.8.21;
 import { DefaultParameters } from "./../../core_codegen/index.sol";
 
 /**
- * @title IPopCraftSystem
+ * @title IMClearBoardSystem
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
-interface IPopCraftSystem {
-  function popCraft_PopCraftSystem_interact(DefaultParameters memory default_parameters, uint256 mode) external;
+interface IMClearBoardSystem {
+  function popCraft_MClearBoardSyste_pop(DefaultParameters memory default_parameters) external;
+
+  function popCraft_MClearBoardSyste_checkGameSuccess(uint256[] memory matrix_array) external pure returns (bool);
 }

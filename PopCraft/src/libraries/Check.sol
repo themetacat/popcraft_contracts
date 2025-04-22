@@ -98,8 +98,7 @@ library Check {
     uint256 totalPrice;
     for (uint256 i; i < pararmLength; i++) {
       totalPrice +=
-        (PriTokenPrice.get(priResultParams[i].token_info.token_addr) * priResultParams[i].token_info.amount) /
-        1e18;
+        (PriTokenPrice.get(priResultParams[i].token_info.token_addr) * priResultParams[i].token_info.amount);
     }
     uint256 NFTBalance = IERC721(0xf6e9932469CBde5dB4b9293330Ff1897Bb43b2AE).balanceOf(player);
     uint256 discount = 0;
@@ -110,7 +109,7 @@ library Check {
         discount = NFTToTokenDiscount.get(NFTBalance);
       }
     }
-    require((totalPrice * (100 - discount)) / 100 == value, "Insufficient payment amount");
+    require((totalPrice * (100 - discount)) / 100 == value * 1e18, "Insufficient payment amount");
   }
 
   function checkIsPriToken(address tokenAddr) internal view returns (bool) {
@@ -162,18 +161,6 @@ library Check {
     }
 
     return false;
-  }
-
-  function check_game_finished(uint256[] memory matrix_array) public pure returns (bool) {
-    unchecked {
-      for (uint256 i; i < 99; ) {
-        if (matrix_array[i] != 0) {
-          return false;
-        }
-        i++;
-      }
-    }
-    return true;
   }
 
   function checkComboRewardEligibility(address player) public view returns (bool) {

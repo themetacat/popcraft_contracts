@@ -16,6 +16,23 @@ export default mudConfig({
         tokenAddressArr: "address[]"
       }
     },
+    GameMode:{
+      keySchema: {
+        owner: "address",
+      },
+      valueSchema: {
+        mode: "uint256",
+      }
+    },
+    ScoreChal: {
+      keySchema: {
+        player: "address",
+      },
+      valueSchema: {
+        added: "bool",
+        newMatrixArray: "uint256[]",
+      }
+    },
     TokenBalance: {
       keySchema: {
         owner: "address",
@@ -42,6 +59,21 @@ export default mudConfig({
         times: "uint256",
         successTimes: "uint256",
         unissuedRewards: "uint256",
+        totalPoints: "uint256",
+      }
+    },
+    ModeRecord: {
+      keySchema: {
+        owner: "address",
+        mode: "uint256",
+      },
+      valueSchema: {
+        totalScore: "uint256",
+        highestScore: "uint256",
+        latestScores: "uint256",
+        shortestTime: "uint256",
+        times: "uint256",
+        successTimes: "uint256",
         totalPoints: "uint256",
       }
     },
@@ -145,6 +177,23 @@ export default mudConfig({
         owner: "address",
         season: "uint256",
         dimension: "uint256"
+      },
+      valueSchema: {
+        totalScore: "uint256",
+        highestScore: "uint256",
+        latestScores: "uint256",
+        shortestTime: "uint256",
+        times: "uint256",
+        successTimes: "uint256",
+        totalPoints: "uint256",
+      }
+    },
+    ModeWeeklyRecord: {
+      keySchema: {
+        owner: "address",
+        season: "uint256",
+        dimension: "uint256",
+        mode: "uint256"
       },
       valueSchema: {
         totalScore: "uint256",
