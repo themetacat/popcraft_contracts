@@ -59,8 +59,6 @@ contract MScoreChallengeSystem is System {
       // game success
       if (gameSuccess) {
         PopCraftUtils.gameSuccess(sender, 1);
-      } else {
-        matrix_array = regenerateBottomRows(sender, matrix_array);
       }
       
       tcmPopStarData.gameFinished = gameSuccess;
@@ -82,27 +80,34 @@ contract MScoreChallengeSystem is System {
 
   function regenerateBottomRows(address player, uint256[] memory board) private returns (uint256[] memory) {
     ScoreChalData memory scoreChalData = ScoreChal.get(player);
-    if (scoreChalData.added) {
+    uint256[] memory newMatrixArray = scoreChalData.newMatrixArray;
+    uint256 newMatrixArrayLength = newMatrixArray.length;
+    if (newMatrixArray[newMatrixArrayLength - 1] == 0) {
       return board;
     }
-    bool topCleared = true;
-    for (uint256 i = 0; i < 70; i++) {
-      if (board[i] != 0) {
-        topCleared = false;
-        break;
+    uint256 newValueIndex = findNewValueIndex(newMatrixArray);
+    if(newValueIndex == newMatrixArrayLength){
+      return board;
+    }
+    for (uint256 i = 100; i > 0; i--) {
+      uint256 index = i - 1;
+      if(board[index] == 0){
+        if(newValueIndex == newMatrixArrayLength || newMatrixArray[newValueIndex] == 0) break;
+        board[index] = newMatrixArray[newValueIndex];
+        newMatrixArray[newValueIndex] = 0;
+        newValueIndex++;
       }
     }
-
-    if (topCleared) {
-      for (uint256 i = 40; i < 69; i++) {
-        board[i] = board[i + 30];
-      }
-
-      for (uint256 i = 0; i < scoreChalData.newMatrixArray.length; i++) {
-        board[i + 70] = scoreChalData.newMatrixArray[i];
-      }
-      ScoreChal.set(player, true, scoreChalData.newMatrixArray);
-    }
+    ScoreChal.set(player, true, newMatrixArray);
     return board;
+  }
+
+  function findNewValueIndex(uint256[] memory newMatrixArray) pure private returns (uint256){
+    for (uint256 index = 0; index < newMatrixArray.length; index++) {
+      if(newMatrixArray[index] != 0){
+        return index;
+      }
+    }
+    return newMatrixArray.length;
   }
 }
