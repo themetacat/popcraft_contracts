@@ -72,7 +72,7 @@ contract MScoreChallengeSystem is System {
   }
 
   function checkGameSuccess(address owner, uint256 eliminateScore) public view returns (bool) {
-    if (ModeRecord.getLatestScores(owner, 1) + eliminateScore >= 600) {
+    if (ModeRecord.getLatestScores(owner, 1) + eliminateScore >= 500) {
       return true;
     }
     return false;
