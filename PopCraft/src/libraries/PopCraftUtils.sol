@@ -67,7 +67,7 @@ library PopCraftUtils {
 
   function comboReward(uint256 eliminateAmount, address tokenAddr, address player) internal {
     bool eligibility = Check.checkComboRewardEligibility(player);
-    if (eliminateAmount >= 5 && eligibility) {
+    if (eliminateAmount >= 5 && eligibility && Check.checkIsPriToken(tokenAddr)) {
       uint256 amount = eliminateAmount / 5;
       // add new token: change here
       uint256 rewardTokenAmount = amount * 10 ** 18;

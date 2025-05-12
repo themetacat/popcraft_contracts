@@ -114,7 +114,7 @@ contract PopCraftExtension is Script {
     // }
     // Token.set(0, dynamicTokenAddress);
 
-    address[10] memory tokenAddress = [
+    address[11] memory tokenAddress = [
       0x0000000000000000000000000000000000000003,
       0x0000000000000000000000000000000000000004,
       0x0000000000000000000000000000000000000005,
@@ -124,9 +124,10 @@ contract PopCraftExtension is Script {
       0x0000000000000000000000000000000000000009,
       0x0000000000000000000000000000000000000010,
       0x0000000000000000000000000000000000000011,
-      0x0000000000000000000000000000000000000012
+      0x0000000000000000000000000000000000000012,
+      0xe2E7D83dFBd25407045Fd061e4c17cC76007deaD
     ];
-    address[] memory dynamicTokenAddress = new address[](10);
+    address[] memory dynamicTokenAddress = new address[](11);
 
     for (uint256 i = 0; i < tokenAddress.length; i++) {
       dynamicTokenAddress[i] = tokenAddress[i];
